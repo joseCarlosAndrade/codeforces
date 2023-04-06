@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include<string.h>
 
-# problem: https://codeforces.com/problemset/problem/1807/F
+// problem: https://codeforces.com/problemset/problem/1807/F
 
 typedef struct Bouncy
 {
