@@ -10,6 +10,6 @@ int main() {
 
     // printf("Numero: %d\n\t %.2e\n\t %.2f\n", numero, power, square);
     printf("Numero: %d\n"
-           "\t%.2e\n"
-           "\t%.2f\n", numero, power, square);
+           "%17.2e\n"
+           "%13.2f\n", numero, power, square);
 }
