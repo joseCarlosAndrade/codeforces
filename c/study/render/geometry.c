@@ -26,8 +26,8 @@ int main(void)
 
     
     // printf("%s", projection.output);
-    projection.R1 = 1; // raio
-    projection.R2 = 5; // centro do circulo partindo do eixo x
+    projection.R1 = 2; // raio
+    projection.R2 = 13; // centro do circulo partindo do eixo x
 
     projection.K2 = 100;
     // calcular K1 , o desenvolvimento e razao da conta estao no meu caderno
@@ -39,11 +39,13 @@ int main(void)
     int r1, r2, k2;
 
     float A = 0;
+    float B = 0;
     do {
-        render(A, 10.0, ptrProj);
+        render(A, B, ptrProj);
         // char a = getchar();
         // projection.R1 += 0.0001;
         A += 0.001;
+        B += 0.0001;
         // projection.K2 += 0.001;
         // projection.R2 -= 0.0004;
 
@@ -63,6 +65,10 @@ void render(float A, float B, Projection * ptrProj)
 
     float cos_a = cos(A);
     float sin_a = sin(A);
+
+    float cos_b = cos(B);
+    float sin_b = sin(B);
+
 //     char output[71][21];
 
     // for (int j = 0; j < ptrProj->screen_height; j++)
@@ -89,8 +95,12 @@ void render(float A, float B, Projection * ptrProj)
 
             float circlex = (r1_r2)*cos_p;
             float circley = (ptrProj->R1*sin_t*cos_a) + r1_r2*sin_p*sin_a;
-            float circlez = ptrProj->K2 + (-sin_p * r1_r2*cos_a + ptrProj->R1*sin_t*sin_a);
+            float circlez =  (-sin_p * r1_r2*cos_a + ptrProj->R1*sin_t*sin_a);
 
+            circlex = circlex*cos_b - circley*sin_b;
+            circley = circlex*sin_b + circley*cos_b;
+        
+            circlez += ptrProj->K2; 
             // Projecaox
             float z_inverso = 1/circlez;
             // printf("%f", z_inverso);
