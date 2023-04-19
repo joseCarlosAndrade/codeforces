@@ -26,8 +26,8 @@ int main(void)
 
     
     // printf("%s", projection.output);
-    projection.R1 = 2; // raio
-    projection.R2 = 13; // centro do circulo partindo do eixo x
+    projection.R1 = 1; // raio
+    projection.R2 = 5; // centro do circulo partindo do eixo x
 
     projection.K2 = 100;
     // calcular K1 , o desenvolvimento e razao da conta estao no meu caderno
@@ -36,7 +36,7 @@ int main(void)
 
     // render(10.0, 10.0, ptrProj);
 
-    int r1, r2, k2;
+    // int r1, r2, k2;
 
     float A = 0;
     float B = 0;
@@ -54,7 +54,7 @@ int main(void)
         // projection.R2 = r2;
         // projection.K2 = k2;
         
-    } while (r1 != 0);
+    } while (1);
 }   
 
 void render(float A, float B, Projection * ptrProj)
@@ -97,8 +97,13 @@ void render(float A, float B, Projection * ptrProj)
             float circley = (ptrProj->R1*sin_t*cos_a) + r1_r2*sin_p*sin_a;
             float circlez =  (-sin_p * r1_r2*cos_a + ptrProj->R1*sin_t*sin_a);
 
+            // rotacionar em torno do eixo z
             circlex = circlex*cos_b - circley*sin_b;
             circley = circlex*sin_b + circley*cos_b;
+
+            // rotacionar em torno do eixo y
+            circlex = circlex*cos_a + circlez*sin_a;
+            circlez = circlex*(-sin_a) + circlez*cos_a;
         
             circlez += ptrProj->K2; 
             // Projecaox
@@ -111,21 +116,26 @@ void render(float A, float B, Projection * ptrProj)
             // porem o buffer que definimos toma y+ para baixo
             int x = (int) (ptrProj->screen_width/2 + ( ptrProj->K1 * circlex * z_inverso));
             int y = (int) (ptrProj->screen_height/2 - (ptrProj->K1 * circley * z_inverso));
-            // printf("%d %d ;" , x, y);
-            
-            // if ()
-            // {
-                output[x][y] = 'O';
-            // }
-            // for (float phi = 0; phi < 2*3.14; phi += ptrProj->phi_spacing)
-            // {
-            //     float cos_p = cos(phi);
-            //     float sin_p = sin(phi);
+          
+            float nx = cos_t;
+            float ny = sin_t;
+            float nz = 0;
 
-            //     //  coordenadas na frame absoluta do mundo 
-            //     float circleX = (ptrProj->R2 + ptrProj->R1*cos_t)*cos_p;
-            //     float circleY = (ptrProj->R1*sin_t);    
-            // }
+            // rotacionando em torno do eixo y
+            nx = nx*cos_p ;
+            nz = -nx*sin_p;
+
+            // rot em torno do eixo x
+            ny = cos_a*ny  - sin_a*nz;
+            nz = ny*sin_a + nz*cos_a;
+
+            // rot em torno do eixo z
+            nx = nx*cos_b - ny*sin_b;
+            ny = nx*sin_b + ny*cos_b; 
+
+
+            output[x][y] = 'O';
+           
     }
     }
 
