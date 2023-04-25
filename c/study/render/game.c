@@ -21,7 +21,7 @@ typedef struct Screen
 
     int cur_piece, next_piece;
 
-    Piece * cur_piece;
+    Piece * cur_piece_struct;
 } Screen;
 
 
@@ -41,7 +41,7 @@ int main(void)
     screen.next_piece = 0;
     
     Piece * curr = create_piece(ptrScreen);
-    screen.cur_piece = curr;
+    screen.cur_piece_struct = curr;
     init_blank_screen(ptrScreen);
     
     render(ptrScreen);
@@ -84,15 +84,15 @@ void init_blank_screen(Screen * screen)
 
         }
     }
-    int index = 0;
-    while (1)
-    {
-        // ERRO AQUIIII
-        int x = screen->cur_piece->x;
-        screen->output[index++][index++] = '@';
+    // int index = 0;
+    // while (1)
+    // {
+    //     // ERRO AQUIIII
+    //     int x = screen->cur_piece_struct->x;
+    //     // screen->output[index++][index++] = '@';
         
-        // index++;
-    }
+    //     // index++;
+    // }
 }
 
 Piece * create_piece(Screen * screen)
@@ -100,7 +100,7 @@ Piece * create_piece(Screen * screen)
     switch (screen->next_piece)
     {
     case 0:
-        Piece square;
+        {Piece square;
         Piece * ptrSquare = &square;
         square.x = screen->width/2 + 1;
         square.y = 2;
@@ -116,9 +116,10 @@ Piece * create_piece(Screen * screen)
         screen->cur_piece = 0;
 
         return ptrSquare;
-        break;
+        break;}
     
     default:
         break;
     }
+    return 0;
 }
