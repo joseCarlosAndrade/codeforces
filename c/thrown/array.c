@@ -45,7 +45,7 @@ int return_size(int *array )
     return array_size / element_size;
 }
 
-int return_size_last(int *array)
+int return_size_last(int *array) // nao vale -> nesse escopo é apenas um ponteiro, entao sizeof() retorna tamanho do ponteiro
 {
     // int count = 0;
     int i=0;
