@@ -1,4 +1,7 @@
 import java.util.List;
+
+import javax.swing.plaf.basic.BasicListUI.ListSelectionHandler;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,27 +58,111 @@ public class Placar {
         }
         // posiçao em casos fixos
         else {
-            int[] frequencia = checar_por_soma(dados);
+            int[] frequencia = checar_frequencia_por_soma(dados);
+            pontuacao_atual = 0;
+            // retorna uma lista com a frequencia de cada numero nos 5 dados
+            // 0, 1, 2, 3, 4 (index)
+            // 1, 2, 3, 4, 5 (dados)
+            // 0, 3, 2, 0, 0 -> 3 dados numero 2, 2 dados numero 3
 
             switch (posicao){
-                // full hand
+                // full hand 15 pontos  
                 case 7:
                 {  
+                    if (elemento_na_lista(2, frequencia) && elemento_na_lista(3, frequencia))
+                    {
+                        pontuacao_atual = 15;
+                    }
                     
                     break;
                 }
-                case 8:
-                case 9:
-                case 10:
+                case 8: // sequencia 20 pontos
+                {
+                   
+                    if (checar_sequencia(dados) == 1) {
+                        
+                        pontuacao_atual = 20;
+                    }
+                    
+                    break;
+                }
+                case 9: // quadra 30 pontos
+                {
+                    for (int i=0; i < dados.length; i++)
+                    {
+                        if (frequencia[i]==4)
+                        {
+                            pontuacao_atual = 30;
+                        } 
+                    }
+                    break;
+                }
+                case 10: // quina 40 pontos
+                {
+                    for (int i=0; i < dados.length; i++)
+                    {
+                        if (frequencia[i]==5)
+                        {
+                            pontuacao_atual = 40;
+                        } 
+                    }
+                    break;
+                }
 
             }
+            placar[posicao-1] = pontuacao_atual;
         }
-
 
     }
 
-    // TO DO
-    public int[] checar_por_soma(int[] dados)
+    public boolean elemento_na_lista(int elemento, int[] lista)
+    // retorna true se lista contem elemento
+    {
+        for (int i = 0; i < lista.length; i++)
+        {
+            if (lista[i] == elemento)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public int checar_sequencia(int[] dados)
+    {
+        // define o menor numero na array
+        int menor_numero = dados[0];
+        for (int i = 0; i < dados.length; i++)
+        {
+            if (dados[i] < menor_numero){
+                menor_numero = dados[i];
+            }
+        }
+
+        int contador_sequencia= 0;
+        for (int i = 0; i < dados.length; i++)
+        {
+            for (int j = 0; j < dados.length; j++)
+            {
+                if (dados[j] == menor_numero+1)
+                {
+                    contador_sequencia++;
+                    menor_numero = dados[j];
+                    continue;
+                }
+            }
+        }
+        if (contador_sequencia == dados.length-1) {
+            // retorna 1, sequencia encontrada
+            return 1;
+        }
+        // caso contrario, retorna 0
+        return 0;
+    }
+
+    // TO DO !!!!!!!!!!!!!!!!!!!!!!!!!
+    public int[] checar_frequencia_por_soma(int[] dados)
     {
         int[] score;
         int[] old_list;

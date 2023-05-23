@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>js04</title>
+</head>
+<body>
+    <h2>Exercicio 1</h2>
+    <input type="text" name="nome" id="nome" placeholder="Nome">
+    <br>
+    <input type="number" name="dia" id="dia" placeholder="Dia">
+    <input type="number" name="mes" id="mes" placeholder="Mes">
+    <input type="number" name="ano" id="ano" placeholder="Ano">
+    <button id="botao-idade" onclick="calcular_idade()">Calcular idade</button>
+
+    <br>
+    <p id="idade"></p>
+    
+    <br>
+    <h2>Exercicio 2</h2>
+    <p>Insira as seguintes informaçoes acerca do objeto: </p>
+    <input type="text" name="nome" id="cachorro-nome" placeholder="Nome">
+    <input type="number" name="idade" id="cachorro-idade" placeholder="Idade">
+    <input type="text" name="porte" id="cachorro-porte" placeholder="Porte">
+    <input type="text" name="cor" id="cachorro-cor" placeholder="Cor">
+
+    <button id="add-cachorro" onclick="adicionar_cachorro()">Adicionar objeto</button>
+
+    <p id="array-cachorro"></p>
+
+    <br>
+    <h2>Exercicio 3</h2>
+    <p>Digite as informaçoes dos retangulos</p>
+    <input type="number" name="altura" id="ret-altura" placeholder="Altura">
+    <input type="number" name="largura" id="ret-largura" placeholder="Largura">
+    <input type="text" name="cor" id="ret-cor" placeholder="Cor">
+   
+    <button id="add-ret" onclick="adicionar_retangulo()">Adicionar Retangulo</button>
+    <button id="draw-ret" onclick="desenhar_retangulo()">Desenhar Retangulos</button>
+
+    <div id="retangulo-desenho"></div>
+
+</body>
+<script src="script.js"></script>
+</html>
