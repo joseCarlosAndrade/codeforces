@@ -1,5 +1,6 @@
 import java.util.Arrays;
 
+
 public class RolaDados {
     private Dado [] lista_dados;
     private int n_dados = 5;
@@ -15,12 +16,13 @@ public class RolaDados {
     }
 
     // rola todos os lados
-    public int[] rolar()
+    public int[] rolar() throws InterruptedException
     {   
         // int[] valor_dados = new int[5];
         int[] valor_dados = {};
         for ( Dado dado : lista_dados )
         {
+            // System.out.println(dado.rolar());
             valor_dados = appendArrayInt(valor_dados, dado.rolar());
             
         }
@@ -30,7 +32,7 @@ public class RolaDados {
 
     // Dado rola() somente quando true é passado no boolean
     // Caso false, Dado getLado()
-    public int[] rolar (boolean[] quais)
+    public int[] rolar (boolean[] quais) throws InterruptedException
     {
         int[] valor_dados = {};
         
@@ -46,7 +48,7 @@ public class RolaDados {
         return valor_dados;
     }
 
-    public int[] rolar (String s)
+    public int[] rolar (String s) throws InterruptedException
     {
         int [] valor_dados = {};
         // for (int i = 0; i < lista_dados.length; i++)
@@ -72,14 +74,46 @@ public class RolaDados {
     @Override
     public String toString()
     {
+        String horizontal = ("");
+
+        for (int i =0; i < n_dados; i++)
+        {
+            horizontal += ((i+1) + "         "); // 3 de espaço entre cada dado
+        }
+
+        horizontal += ("\n");
         
+        for (int j=0; j < 5; j++)
+        {
+            for (int i = 0 ; i< n_dados; i++)
+            {
+                int adder_string = j*7 ;
+
+                horizontal += (lista_dados[i].toString().substring(0 + adder_string, 7+adder_string) + "   ");
+            }
+            horizontal += ("\n");
+        }
+
+        return horizontal;
     }
     
     public int[] appendArrayInt(int[] array, int elemento)
     {
         int[] arr = Arrays.copyOf(array, array.length+1);
-        arr[array.length+1] = elemento;
+        arr[array.length] = elemento;
 
         return arr;
     }
+
+    // public int[] returnArrayDados()
+    // {
+    //     int[] lista_valor = new int[n_dados];
+
+    //     for (Dado dado : lista_dados)
+    //     {
+
+    //     }
+
+    //     return lista_valor;
+    // }
 }

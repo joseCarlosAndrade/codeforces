@@ -8,9 +8,14 @@ public class Random {
     // semente:
     private long xi = 1023;
 
-    public Random(int k)
+    public Random(long k)
     {
-        xi = k;
+        // k = k / 1000000;
+        // k = k * k;
+        long cont = k & 1;
+        cont += k & 11111;
+        xi = cont * cont * cont;
+        // System.out.println(xi);
     }
 
     public Random() // outro construtor para caso nao seja passado nenhum parametro, use o valor padrao

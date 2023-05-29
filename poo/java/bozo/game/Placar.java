@@ -1,15 +1,9 @@
-import java.util.List;
-
-import javax.swing.plaf.basic.BasicListUI.ListSelectionHandler;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Placar {
 
     private int[] posicoes_ocupadas = new int[10];
-    private int[] placar = {0,0,0,0,0,0,0,0,0,0};
+    private int[] placar = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 
     // private List<Integer> posicoes_ocupadas = new ArrayList<>();
     
@@ -54,7 +48,7 @@ public class Placar {
                 }
             }
 
-            placar[posicao-1] = pontuacao_atual;
+            placar[posicao-1] = pontuacao_atual * posicao;
         }
         // posiçao em casos fixos
         else {
@@ -90,7 +84,7 @@ public class Placar {
                 {
                     for (int i=0; i < dados.length; i++)
                     {
-                        if (frequencia[i]==4)
+                        if (frequencia[i]>=4)
                         {
                             pontuacao_atual = 30;
                         } 
@@ -115,6 +109,9 @@ public class Placar {
 
     }
 
+
+    // a partir daqui sao funcoes nao inclusas no javadoc, feitas para facilitar algumas logicas
+
     public boolean elemento_na_lista(int elemento, int[] lista)
     // retorna true se lista contem elemento
     {
@@ -128,17 +125,18 @@ public class Placar {
         return false;
     }
 
-
     public int checar_sequencia(int[] dados)
     {
         // define o menor numero na array
         int menor_numero = dados[0];
+
         for (int i = 0; i < dados.length; i++)
         {
             if (dados[i] < menor_numero){
                 menor_numero = dados[i];
             }
         }
+        // System.out.printf("menor numero: %d", menor_numero);
 
         int contador_sequencia= 0;
         for (int i = 0; i < dados.length; i++)
@@ -149,10 +147,11 @@ public class Placar {
                 {
                     contador_sequencia++;
                     menor_numero = dados[j];
-                    continue;
+                    // continue;
                 }
             }
         }
+  
         if (contador_sequencia == dados.length-1) {
             // retorna 1, sequencia encontrada
             return 1;
@@ -161,35 +160,24 @@ public class Placar {
         return 0;
     }
 
-    // TO DO !!!!!!!!!!!!!!!!!!!!!!!!!
     public int[] checar_frequencia_por_soma(int[] dados)
     {
-        int[] score;
-        int[] old_list;
+        int [] frequencia = { 0, 0, 0, 0, 0, 0 };
 
-        for (int i=0; i < dados.length; i++)
+        // loop em cada face  
+        for (int i=1; i < 7; i++)
         {
-            for (int o =0; o< old_list.length; o++)
+            for (int j = 0; j < dados.length; j++)
             {
-                if (dados[i] == old_list[o]){
-                    continue;
-                }
-            }
-
-            int[] buffer;
-            for (int j=0; j<dados.length;j++)
-            {
-                if(dados[i] == dados[j])
+                if (dados[j] == i)
                 {
-                    buffer = appendArrayInt(buffer, dados[j]);
-                    old_list = appendArrayInt(old_list, dados[j]);
+                    frequencia[i-1] += 1;
                 }
             }
-
-            // score = appendArrayInt(score, )
         }
 
-        return dados;
+        return frequencia;
+
     }
 
     public int getScore()
@@ -197,6 +185,10 @@ public class Placar {
         int soma = 0;
         for (int i=0; i<placar.length ; i++)
         {
+            if (placar[i] ==-1 )
+            {
+                continue;
+            }
             soma += placar[i];
         }
         return soma;
@@ -208,7 +200,7 @@ public class Placar {
         String[] lp = new String[10];
         for (int i = 0; i < placar.length; i++)
         {
-            if (placar[i] ==0 )
+            if (placar[i] ==-1 )
             {
                 lp[i] = " ";
             }
@@ -221,12 +213,12 @@ public class Placar {
 String.format(
 "(1) %s  |   (7) %s   | %s  (4) \n"+ 
 "-------------------------- \n"+
-"(2) %s  |   20  %s   | %s  (5)  \n"+
+"(2) %s  |   (8) %s   | %s  (5)  \n"+
 "-------------------------- \n"+
-"(3) %s  |   30  %s   | %s  (6)  \n"+
+"(3) %s  |   (9) %s   | %s  (6)  \n"+
 "-------------------------- \n"+
 "        |   (10)  %s |     \n"+
-"        +------------+        \n", lp[0],lp[1],lp[2],lp[3],lp[4],lp[5],lp[6],lp[7],lp[8],lp[9]);
+"        +------------+        \n", lp[0],lp[6],lp[3],lp[1],lp[7],lp[4],lp[2],lp[8],lp[5],lp[9]);
 
         return placar_string;
     }
@@ -245,6 +237,18 @@ String.format(
         arr[array.length-1] = elemento;
         
         return arr;
+    }
+
+    public boolean endReached()
+    {
+        for (int i=0; i<placar.length ; i++)
+        {
+            if (placar[i] == -1 )
+            {
+                return false;
+            }
+        }
+        return true;
     }
     
 }

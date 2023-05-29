@@ -1,47 +1,50 @@
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+import java.lang.Thread;
 public class Dado {
     private int lados, numero;
 
     private String dado1 =
-"+-----+\n"+   
-"|     |\n" +    
-"|  *  |\n" +    
-"|     |\n" +    
-"+-----+\n";
+"+-----+"+   
+"|     |" +    
+"|  *  |" +    
+"|     |" +    
+"+-----+";
 
     private String dado2 =
-"+-----+\n"+   
-"|     |\n" +    
-"|  *  |\n" +    
-"|     |\n" +    
-"+-----+\n";
+"+-----+"+   
+"|*    |" +    
+"|     |" +    
+"|    *|" +    
+"+-----+";
 
     private String dado3 =
-"+-----+\n"+   
-"|     |\n" +    
-"|  *  |\n" +    
-"|     |\n" +    
-"+-----+\n";
+"+-----+"+   
+"|*    |" +    
+"|  *  |" +    
+"|    *|" +    
+"+-----+";
 
     private String dado4 =
-"+-----+\n"+   
-"|     |\n" +    
-"|  *  |\n" +    
-"|     |\n" +    
-"+-----+\n";
+"+-----+"+   
+"|*   *|" +    
+"|     |" +    
+"|*   *|" +    
+"+-----+";
 
     private String dado5 =
-"+-----+\n"+   
-"|     |\n" +    
-"|  *  |\n" +    
-"|     |\n" +    
-"+-----+\n";
+"+-----+"+   
+"|*   *|" +    
+"|  *  |" +    
+"|*   *|" +    
+"+-----+";
 
     private String dado6 =
-"+-----+\n"+   
-"|     |\n" +    
-"|  *  |\n" +    
-"|     |\n" +    
-"+-----+\n";
+"+-----+"+   
+"|*   *|" +    
+"|*   *|" +    
+"|*   *|" +    
+"+-----+";
 
     private String[] lista_dados = {dado1, dado2, dado3, dado4, dado5, dado6};
 
@@ -70,16 +73,19 @@ public class Dado {
             lados = 6;
         }
     }
-    
+
     public int getLado()
     {
         return numero;
     }
 
-    public int rolar()
+    public int rolar() throws InterruptedException
     {
-        // int n = EntradaTeclado.leInt();
-        Random r = new Random();
+  
+        Date date = new Date();
+
+        Thread.sleep(100);
+        Random r = new Random(date.getTime());
         numero = r.getIntRand(lados) +1;
 
         return numero;
@@ -89,11 +95,7 @@ public class Dado {
     public String toString()
     {
         return lista_dados[numero-1];
-        // System.out.println(lista_dados[numero-1]);
-        // switch (numero)
-        // {
-        //     case 0:
-        //     System.out.println(dado1);
-        // }
+
+
     }
 }
