@@ -1,4 +1,5 @@
 bin/
+doc/
 .compile
 
 __pycache__/

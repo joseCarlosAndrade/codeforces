@@ -1,16 +1,26 @@
 public abstract class Funcionario
 {
-    String nome;
-    String CPF;
-    double salarioBase;
+    private String nome;
+    private String CPF;
+    protected double salarioBase;
     public abstract double calculaSalario();
 
     public void setInformacoes(String Nome, String CPF_numero, double salarioBase_numero)
     {
         nome = Nome;
-        CPF = CPF_numero;
-        salarioBase = salarioBase_numero;
+        salarioBase = salarioBase_numero; 
+
+        if (Funcionario.verificaCPF(CPF_numero)) CPF = CPF_numero;
+
+        else throw new Error("CPF inválido.");
+
     }
+
+    public String getNome()
+    {
+        return nome;
+    }
+
 
     /*
      * Metodo estatico definido para avaliar se o cpf é valido ou nao.
