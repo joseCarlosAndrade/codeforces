@@ -1,2 +1,2 @@
-# Codeforces Solutions Set
-Repository to store my codeforces solutions to some of the Codeforces problems 
+# My dev section
+Repository to store some of my code
