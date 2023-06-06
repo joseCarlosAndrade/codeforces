@@ -2,5 +2,9 @@ bin/
 doc/
 .compile
 
+# vscode stuff
 __pycache__/
 .vscode/
+
+# java
+*.class

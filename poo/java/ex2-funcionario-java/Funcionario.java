@@ -32,7 +32,7 @@ public abstract class Funcionario
         // CPF: String 111.111.111-11
         int verificador1 = Integer.parseInt(CPF.substring(9, 10));
         int verificador2 = Integer.parseInt(CPF.substring(10, 11));
-        for (int i =0; i < 10; i ++)
+        for (int i = 0; i < 10; i ++)
         {
             // primeira vaidacao
             if (i < 9)
