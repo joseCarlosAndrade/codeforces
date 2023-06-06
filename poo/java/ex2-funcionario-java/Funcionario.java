@@ -3,8 +3,25 @@ public abstract class Funcionario
     private String nome;
     private String CPF;
     protected double salarioBase;
+
+    /**
+     * Método abstrato que retorna o calculo do salario de acordo com o cargo.
+     * @return double -> Salário
+     */
     public abstract double calculaSalario();
 
+    /**
+     * Método abstrato que retorna o cargo do funcionario.
+     * @return String -> Cargo
+     */
+    // public abstract String getCargo();
+
+    /**
+     * Método set para inicializar atributos padrões da classe base Funcionario.
+     * @param Nome
+     * @param CPF_numero
+     * @param salarioBase_numero
+     */
     public void setInformacoes(String Nome, String CPF_numero, double salarioBase_numero)
     {
         nome = Nome;
@@ -16,14 +33,38 @@ public abstract class Funcionario
 
     }
 
+    /**
+     * Método que retorna o nome da classe para obter o cargo do funcionário.
+     * @return String
+     */
+    public String getCargo()
+    {
+        return this.getClass().getSimpleName();
+    }
+
+    /**
+     * Getter para nome.
+     * @return String -> nome.
+     */
     public String getNome()
     {
         return nome;
     }
 
+    /**
+     * Getter para CPF
+     * @return String -> CPF.
+     */
+    public String getCPF()
+    {
+        return CPF;
+    }
 
-    /*
-     * Metodo estatico definido para avaliar se o cpf é valido ou nao.
+
+    /**
+     * Método estático que valida o CPF passado como parâmetro.
+     * @param CPF
+     * @return boolean -> CPF válido ou não.
      */
     public static boolean verificaCPF(String CPF)
     {

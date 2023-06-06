@@ -1,42 +1,96 @@
+import java.io.IOException;
+import java.util.Arrays;
+
+import javax.swing.text.Style;
 public class Folha {
     
-    public static void main(String args[])
+    public static void main(String args[]) throws IOException
     {
-        // 41409331863 cpf invalido
-        String nomes[] = {"jose", "andrade", "marcos", "pedro", "maria"};
+        /* Instanciando arrays e cada funcionário. */
+        Assistente assistentes[] ={};
+        Gerente gerentes[] ={};
+        Vendedor vendedores[] ={};
 
-        String cpf[] = {"47696231863", "41409331865", "41409331865", "41409331865", "4140931865"};
-        Funcionario funcionarios[];
-
-        for (int i = 0; i < 2; i++)
+        // assistentes = appendElemento(assistentes, new Assistente("José", "47696231863", 1000));
+        // gerentes = appendElemento(gerentes, new Gerente("José", "47696231863", 1000));
+        // vendedores = appendElemento(vendedores, new Vendedor("José", "47696231863", 1000, 100));
+        
+        while (true)
         {
-            funcionarios[i] = new Assistente(nomes[i], cpf[i], 1000);
-        }
+            System.out.println("Digite as informações do(a) funcionário(a). (Digite SAIR para interromper o cadastro e mostrar o resultado.) ");
 
-        for (int i = 2; i < 4; i++)
-        {
-            funcionarios[i] = new Gerente(nomes[i], cpf[i], 2000);
+            System.out.print("Nome: ");
+            String nome = EntradaTeclado.leString();
+            if (nome.equals("SAIR")) break;
 
-        }
+            System.out.print("CPF: ");
+            String cpf = EntradaTeclado.leString();
 
-        for (int i = 4; i < 5; i++)
-        {
-            funcionarios[i] = new Vendedor(nomes[i], cpf[i], 1000, 500);
+            // checa se o cpf é valido. Caso não seja, lança um erro.
+            if (!Funcionario.verificaCPF(cpf)) throw new Error("Erro - CPF inválido.");
 
+            System.out.print("Salário Base: ");
+            Double salarioBase = EntradaTeclado.leDouble();            
+
+            System.out.print("Insira o cargo (ex. vendedor, gerente ou assistente): ");
+            String cargo = EntradaTeclado.leString();
+            
+
+            if (cargo.equals("vendedor")) {
+                System.out.print("Digite a comissão do(a) vendedor(a): ");
+                Double comissao = EntradaTeclado.leDouble();
+                vendedores = appendElemento(vendedores, new Vendedor(nome, cpf, salarioBase, comissao));
+                
+            }
+            else if (cargo.equals("assistente")) assistentes = appendElemento(assistentes, new Assistente(nome, cpf, salarioBase));
+            
+            else if (cargo.equals("gerente")) gerentes = appendElemento(gerentes, new Gerente(nome, cpf, salarioBase));
+        
+            else System.out.println("Cargo não encontrado.");
+
+            System.out.println();
         }
 
         double totalSalario = 0;
 
-        for (int i = 0; i < 5; i++)    
-        {
-            double salario = funcionarios[i].calculaSalario();
-            System.out.printf("Nome: %s; Salario: %d\n", funcionarios[i].getNome(), salario);
-            totalSalario += salario;
+        System.out.println("\n====== Informações dos(as) funcionários(as): ======\n");
+
+        /* Saída para apresentar todos os funcionários e somar o salário total.
+         */
+        for (Assistente assistente : assistentes) {
+            System.out.printf("Funcionario(a): %s; Cargo: %s; CPF: %s; Salario final: R$ %.2f;\n\n", assistente.getNome(), assistente.getCargo(), assistente.getCPF(), assistente.calculaSalario());
+            totalSalario += assistente.calculaSalario();
+        }
+
+        for (Gerente assistente : gerentes) {
+            System.out.printf("Funcionario(a): %s; Cargo: %s; CPF: %s; Salario final: R$ %.2f;\n\n", assistente.getNome(), assistente.getCargo(), assistente.getCPF(), assistente.calculaSalario());
+            totalSalario += assistente.calculaSalario();
+
+        }
+        for (Vendedor assistente : vendedores) {
+            System.out.printf("Funcionario(a): %s; Cargo: %s; CPF: %s; Salario final: R$ %.2f;\n\n", assistente.getNome(), assistente.getCargo(), assistente.getCPF(), assistente.calculaSalario());
+            totalSalario += assistente.calculaSalario();
         }
     
-        System.out.printf("Total em R$: \n", totalSalario);
+        System.out.printf("Total em R$: %.2f\n", totalSalario);
         // Gerente g = new Gerente("jose", cpf, 10);
         // System.out.println(g.calculaSalario());
     
     }
+
+    /**
+     * Metodo estatico para adicionar um elemento generico a uma lista do mesmo tipo.
+     * @param <T> Parametro generico
+     * @param array
+     * @param elemento
+     * @return
+     */
+    public static <T> T[] appendElemento(T[] array, T elemento)
+    {
+        T [] arr = Arrays.copyOf(array, array.length+1);
+        arr[array.length] = elemento;
+        
+        return arr;
+    }    
 }
+

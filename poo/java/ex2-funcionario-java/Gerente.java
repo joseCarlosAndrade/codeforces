@@ -10,4 +10,10 @@ public class Gerente extends Funcionario  {
     {
         return 2*salarioBase;
     }
+
+    // @Override
+    // public String getCargo()
+    // {
+    //     return this.getClass().getSimpleName();
+    // }
 }
