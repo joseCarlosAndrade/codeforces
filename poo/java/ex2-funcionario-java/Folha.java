@@ -1,7 +1,9 @@
 import java.io.IOException;
 import java.util.Arrays;
 
-import javax.swing.text.Style;
+/**
+ * Classe principal, rodando a main function.
+ */
 public class Folha {
     
     public static void main(String args[]) throws IOException
@@ -83,7 +85,7 @@ public class Folha {
      * @param <T> Parametro generico
      * @param array
      * @param elemento
-     * @return
+     * @return <T>[] -> Array de elementos do tipo <T>
      */
     public static <T> T[] appendElemento(T[] array, T elemento)
     {

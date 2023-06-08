@@ -10,12 +10,7 @@ public abstract class Funcionario
      */
     public abstract double calculaSalario();
 
-    /**
-     * Método abstrato que retorna o cargo do funcionario.
-     * @return String -> Cargo
-     */
-    // public abstract String getCargo();
-
+   
     /**
      * Método set para inicializar atributos padrões da classe base Funcionario.
      * @param Nome
@@ -60,7 +55,6 @@ public abstract class Funcionario
         return CPF;
     }
 
-
     /**
      * Método estático que valida o CPF passado como parâmetro.
      * @param CPF
@@ -70,12 +64,10 @@ public abstract class Funcionario
     {
         long primeiraValidacao = 0;
         long segundaValidacao = 0;
-        // CPF: String 111.111.111-11
         int verificador1 = Integer.parseInt(CPF.substring(9, 10));
         int verificador2 = Integer.parseInt(CPF.substring(10, 11));
         for (int i = 0; i < 10; i ++)
         {
-            // primeira vaidacao
             if (i < 9)
             {
                 primeiraValidacao += (10-i) * Integer.parseInt(CPF.substring(i, i+1));
@@ -91,7 +83,6 @@ public abstract class Funcionario
         if (resto1 == 10 || resto1 == 11) resto1 = 0;
         if (resto2 == 10 || resto2 == 11) resto2 = 0;
 
-        // System.out.printf("%d %d %d %d", primeiraValidacao, segundaValidacao, resto1, resto2);
         if (resto1 != verificador1) return false;
         if (resto2 != verificador2) return false;
 
