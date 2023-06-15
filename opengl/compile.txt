@@ -1,0 +1,1 @@
+g++ codeName.c -lGL -lGLU -lglut -lm -o executableName
