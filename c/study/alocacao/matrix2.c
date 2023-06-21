@@ -30,10 +30,10 @@ int main(int argc, char *argv[])
 {
     int ** matrix;
 
-    alocaMatriz1(&matrix, 5, 10);
+    alocaMatriz2(&matrix, 5, 10);
 
     printf("%d\n", matrix[1][2]);
 
-    desalocarMatriz1(matrix, 5);
+    desalocarMatriz2(matrix, 5);
     return 0;
 }

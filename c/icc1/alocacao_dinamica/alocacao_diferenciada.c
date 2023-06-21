@@ -25,6 +25,7 @@ retorno de **linhas -> acessando com matrix[i][j]
 double ** criar_matriz(int N, int M);
 void preencher_matriz(double ** matrix, int N, int M);
 void printar_matriz(double ** matrix, int N, int M);
+void liberar_matriz(double ** matrix, int N, int M);
 
 int main(void)
 {
@@ -78,6 +79,18 @@ void printar_matriz(double ** matrix, int N, int M)
 		printf("\n");
 	}
 }
+
+void liberar_matriz(double ** matrix, int N, int M)
+{
+	for (int i = 0 ; i < N; i++)
+	{
+		free(matrix[i]);
+	}
+	
+	free(matrix);
+}
+
+
 /*
  * 	Ilustração da alocaçao 
 
