@@ -2,167 +2,209 @@
 #include<stdlib.h>
 #include<string.h>
 
-#define MAX_NOME_SIZE 20
+#define MAX_STR_SIZE 20
 
-int preenche_nome(char ** ptr_nome);
-void adicionar_nome(char ** nome, int pos, int tamanho, char*** banco_de_nomes);
-void consulta_nome(char ** nome, int tamanho, int * n_nomes, char *** banco_de_nomes);
-void printar_banco_nomes(char *** banco, int n_nomes);
-void liberar(char *** banco, int n_nomes);
+// debugging macro 
+#define DEBUGGING 0
+
+
+void aloca_banco(char *** banco, int n);
+void adicionar_nome(int mode, char **nome, int tamanho, int pos, char ***banco);
+void consultar_nome(char **nome, char ***banco, int * n_nomes);
+int preencher_nome(char **nome);
+void printar_banco(char *** banco, int n_nomes);
+void liberar(char ***banco, int n);
 
 int main(void)
 {
 	int n_nomes, n_consultas;
-	int *ptr_n_nomes = &n_nomes;
-
 	scanf("%d", &n_nomes);
-	// cria um vetor de ponteiros, o qual cada elemento apontara para um nome
-	char ** banco_de_nomes = (char **)calloc(n_nomes, sizeof(char*));
+
+	char **banco_de_nomes;
+	aloca_banco(&banco_de_nomes, n_nomes);
 	
+	// inserçao de nomes
 	for (int i = 0; i < n_nomes; i++)
 	{
-		char * nome;
-		int tamanho_texto = preenche_nome(&nome);
-		//printf("nome: %s\n", nome);
-		adicionar_nome(&nome, i, tamanho_texto, &banco_de_nomes);
+		char *nome;
+		//int tamanho_texto = preencher_nome(&nome);
+		adicionar_nome(0, &nome, 0, i, &banco_de_nomes);
 	}
+
+	if (DEBUGGING) printf("\nIniciando consulta.\n");
 	
 	scanf("%d", &n_consultas);
-
-	for (int i = 0; i < n_consultas ; i++)
+	
+	// consulta	
+	for (int i = 0; i < n_consultas; i++)
 	{
-		char * consulta;
-		int tamanho_consulta = preenche_nome(&consulta);
+		char *consulta;
 
-		consulta_nome(&consulta, tamanho_consulta, ptr_n_nomes, &banco_de_nomes);
-
-		printf("\nNome a  ser consultado:\n");
-		int j = 0;
-		for(;;)
-		{
-			char c = consulta[j++];
-			if (c == 0) break;
-			putchar(c);
-		}
+		preencher_nome(&consulta); // problema aqui.
+		if (DEBUGGING) printf("\nPreenchimento de consulta '%s' feito\n", consulta);
+		consultar_nome(&consulta, &banco_de_nomes, &n_nomes);
 	}
 
+	printar_banco(&banco_de_nomes, n_nomes);
 
-	printf("\nConsultas finalizadas. \n");
-	printar_banco_nomes(&banco_de_nomes, n_nomes);
-
-	liberar(&banco_de_nomes, n_nomes);		
+	liberar(&banco_de_nomes, n_nomes);
 }
 
-void printar_banco_nomes(char *** banco, int n_nomes)
-{
-	int contador;
-	char c;
 
-	printf("\nPrintando banco de nomes. Numero de nomes: %d\n", n_nomes);
-	for (int i = 0; i < n_nomes; i++)
+
+/* Aloca o banco de nomes por referencia a variavel na funcao main
+ */
+void aloca_banco(char *** banco, int n)
+{
+	if (DEBUGGING) printf("\nAlocando banco de %d nomes: \n", n);
+	*banco = (char**) calloc ( n, sizeof(char*));
+
+	if (*banco == NULL) exit(1);
+
+	for ( int i = 0; i < n; i++)
 	{
-		//printf("%s\n", banco[i]);
-		contador = 0;
-		for (;;) 
-		{
-			c = *banco[i][contador];
-			//printf("%c" , c);
-			if( c == 0 ) break;
-			putchar(c);
-			contador++;
-		}
-		putchar('\n');
+		*((*banco)+i) = (char*) calloc (MAX_STR_SIZE+1, sizeof(char));
+		if (*((*banco)+i) == NULL) exit(1); // erro ao alocar chars
 	}
+
+	if (DEBUGGING) printf("\n%d Nomes alocados para banco de nomes.\n", n);
 }
 
-void consulta_nome(char ** nome, int tamanho, int * n_nomes, char *** banco_de_nomes)
+/* Preenche o nome alocando dinamicamente um ponteiro char*
+ * */
+int preencher_nome(char **nome)
 {
-	// loop de 0 a n_nomes -> se nome esta contido, entao retorna 
-	for (int i = 0 ; i < *n_nomes ; i++)
-	{
-		if (!strcmp(*nome, *banco_de_nomes[i]) ) return;
-	}
+	if (DEBUGGING) printf("\nDigite o nome a ser inserido:\n");
 
-	// caso nome nao estao contido, aumentar banco de dados e incluir nome 
-	printf("\nAdicionando novo nome. Nome: \n");
+	*nome = (char*) calloc(MAX_STR_SIZE+1, sizeof(char));
+	if (DEBUGGING) printf("\nNome antes do preenchimento: %s\n", *nome);
+
 	int i = 0;
-	for(;;)
-	{
-		char c = *nome[i++];
-		if (c == 0) break;
-		putchar(c);
-	}
 
-	(*n_nomes)++;
-	*banco_de_nomes = (char**)realloc(*banco_de_nomes, *n_nomes*sizeof(char));
-	
-	adicionar_nome(nome, (*n_nomes)-1, tamanho, banco_de_nomes);
-	// realloc em banco de dados para n_nomes
-	// adicoinar nome em banco_de_dados na posiaçao n_nomes
-}
-
-int preenche_nome(char ** ptr_nome)
-{
-	*ptr_nome = (char*) calloc(MAX_NOME_SIZE+1, sizeof(char));
-	
-	// erro ao alocar memoria
-	if (*ptr_nome == NULL) exit(1); 
-
-	int contador = 0;
-	
-	for(;;)
-	{
-		char c;
-		scanf(" %c", &c);
-		if (c == '#') break;
-		
-		if (contador > 20) 
-		{
-			*ptr_nome = (char*) realloc(*ptr_nome, (contador+1)*sizeof(char));
-			if (*ptr_nome == NULL ) exit(1);
-			
-		}
-		printf("\nAccessing index %d \n", contador);
-		*ptr_nome[contador] = c;
-		printf("\nchar apos ser preenchido: %c ", *ptr_nome[contador]);
-		contador++;
-	}
-
-	return contador; // retorna tamanho do texto digitado
-}
-
-
-void adicionar_nome(char ** nome, int pos, int tamanho, char*** banco_de_nomes)
-{
-	// alocar char * de N caracteres na posicao pos em banco de nomes
-	*banco_de_nomes[pos] = (char*) calloc(tamanho+1, sizeof(char));
-	if (*banco_de_nomes[pos] == NULL ) exit(1);
-	
-	int i = 0;
 	for (;;)
-	{
-		char c = *nome[i];
-		if (c == 0) break; // nome chegou ao fim
-		putchar(c);
-		*banco_de_nomes[pos][i++] = c;
-
+	{	
+		fflush(stdin);
+		char c = getchar();
+		//scanf(" %c", &c);
+		fflush(stdin);
+		if (c =='#') break;
+		if (c == '\n' || c == '\r') continue;
+		
+		//if ((c >= 65 && c <=90) || ( c >= 97 && c <= 122) || (c == 32))
+		{
+			if (i >=MAX_STR_SIZE ) // string maior que 20, necessario realocar
+			{
+				(*nome) = (char*)realloc (*nome, (i+2)*sizeof(char));
+			}
+			(*nome)[i++] = c;
+			if (DEBUGGING) printf("\nCaractere adicionado: %c\n", c);
+		}
 	}
-	
-	//banco_de_nomes[pos] = nome; // nao sei se essa linha vai funcionar
-	//for (size_t i = 0; i < strlen(nome); i++)
-	//{
-	//	printf("\nprintando: %c ", nome[i]);
-	//}
-	// PROBLEMA TA AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
-	//printf("\ntestando nome : %c \n", *(nome+1));
-	//printf("testando linha %d : %s\n", pos, banco_de_nomes[pos]);
+	(*nome)[i] = 0;
+
+	if (DEBUGGING) printf("\nPalavra adicionada! %s\n", (*nome));
+	return i;
 }
 
-void liberar(char *** banco, int n_nomes)
+/* Adiciona o nome *nome na posicao int pos no banco de nomes **banco
+ */
+void adicionar_nome(int mode, char **nome, int tamanho, int pos, char ***banco)
 {
-	for (int i = 0; i < n_nomes; i++)
+
+	if (mode) // mode 1 -> nome eh passado por parametro
 	{
-		free(*banco[i]);
+		(*banco)[pos] = *nome;
+		if (DEBUGGING) printf("\nParametro: %s\n", *nome);
+	}
+	else // mode 0 -> nome eh lido neste escopo
+	{
+		int i = 0;
+
+		for (;;)
+		{	
+			fflush(stdin);
+			char c = getchar();
+			fflush(stdin);
+			//scanf(" %c", &c);
+			if (c =='#') break;
+			if (c == '\n' || c == '\r') continue;
+			//if ((c >= 65 && c <=90) || ( c >= 97 && c <= 122) || (c == 32))
+			{
+				if (i >=MAX_STR_SIZE ) // string maior que 20, necessario realocar
+				{
+					(*banco)[pos] = (char*)realloc ((*banco)[pos], (i+2)*sizeof(char));
+				}
+				(*banco)[pos][i++] = c;
+			}
+			}
+	
+		(*banco)[pos][i] = 0;
+	}
+
+	//int i = 0;
+
+	if (DEBUGGING)
+	{
+		printf("\nNome adicionado: %s\n", (*banco)[pos]);
+	}
+
+}
+
+/* Consulta a existencia de *nome em **banco_de_nomes. Caso encontre, apenas retorna, nao fazendo nada. 
+ * Caso nao encontre, realoca **banco para armazenar mais um char* e insere *nome la.
+ * */
+void consultar_nome(char **nome, char ***banco, int * n_nomes )
+{
+	if (DEBUGGING) printf("\n Consultando nome '%s'.\n", *nome);
+	for (int i = 0; i < *n_nomes; i++)
+	{	
+		if (strcmp(*nome, (*banco)[i]) == 0) 
+		{
+			if (DEBUGGING) printf("\nNome encontrado.");
+			return;
+		}
+	}
+	if (DEBUGGING) printf("\nNome '%s' nao encontrado. Adicionando no banco de nomes.\n", *nome);
+
+	// Caso nao encontre o nome no banco, adiciona-o
+	// realoca banco de nomes
+	*banco = (char **)realloc( *banco, sizeof(char*) * ++(*n_nomes));
+	
+	if (*banco == NULL) exit(1);
+	
+	// adiciona nome
+	adicionar_nome(1, nome , strlen(*nome),(*n_nomes)-1, banco);
+}
+
+/* Libera toda a memoria alocada para o banco de nomes 
+ * */
+void liberar(char ***banco, int n)
+{
+	for (int i = 0; i < n; i++)
+	{
+		
+		free((*banco)[i]);
+		if (DEBUGGING) printf("\nLinha %d do banco de nomes liberada.\n", i);
 	}
 	free(*banco);
 }
+
+/* Printa o banco de nomes linha a linha
+ * */
+void printar_banco(char *** banco, int n_nomes)
+{
+	if (DEBUGGING) printf("\nBanco de Nomes: \n");
+	for (int i = 0; i < n_nomes; i++)
+	{
+		printf("%s\n", (*banco)[i]);
+	}
+}
+
+/* char ** banco_de_nomes :
+ * 	| char * nome_1 |
+ * 	| char * nome_2 |
+ * 	| char * nome_3 |
+ * 	| char * nome_4 |
+ * 	| char * nome_5 |
+ *
+ * */
