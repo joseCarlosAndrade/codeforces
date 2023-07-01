@@ -9,9 +9,8 @@ The largets of them. It stores everything from university exercices and lists su
 
 ## POO
 
-Set to store data from the discilpine SSC0103 - Programação Orientada a Objetos, which include the fundamentals of OOP programming in Java and Python 3. 
+Set to store data from the discipline SSC0103 - Programação Orientada a Objetos, which includes the fundamentals of OOP programming in Java and Python 3. 
 
 ## Codelab section
 
 Stores all files for the Codelab classes and exercices.
-
