@@ -7,6 +7,10 @@ Most projects are for academic pourposes, but you'll also find personal studies 
 
 The largets of them. It stores everything from university exercices and lists such as `/icc1` and `/lab-icc1`, my personal codeforces solution sets, to personal projects and studies, often on the  `/study` and `/thrown` directories.
 
+![](https://github.com/joseCarlosAndrade/dev-jc/blob/main/media/donut.gif)
+
+You can find this donut on the `c/study/render/donut.c`. To run it, you can compile it with `lm` flag for the `math.h` lib, eg: `gcc donut.c -lm`. Note: **It doesn't work on windows.**
+
 ## POO
 
 Set to store data from the discipline SSC0103 - Programação Orientada a Objetos, which includes the fundamentals of OOP programming in Java and Python 3. 
