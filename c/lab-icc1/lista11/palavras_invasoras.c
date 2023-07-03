@@ -4,27 +4,30 @@
 
 #define MAX_PALAVRA_SIZE 20
 #define INITIAL_TXT_SIZE 100
-#define DEBUGGING 0
+#define DEBUGGING 1
 
 void ler_palavra(char** palavra);
-void ler_texto(char ** texto);
-void filtrar_palavra_invasora(char ** texto, char **palavra, int *);
+void ler_texto(char ** texto, char ** original);
+void filtrar_palavra_invasora(char ** texto, char ** original, char **palavra, int *);
 void printar_texto(char **texto);
 
 
 int main(void)
 {
 	char *palavra_invasora;
-	char *texto;
+	char *texto, *original;
 	int free_text = 1;
 
 	ler_palavra(&palavra_invasora);
-	ler_texto(&texto);
-	filtrar_palavra_invasora(&texto, &palavra_invasora, &free_text);
+	ler_texto(&texto, &original);
+	filtrar_palavra_invasora(&texto, &original, &palavra_invasora, &free_text);
 	printar_texto(&texto);
 
 	free(palavra_invasora);
-	if (free_text) free(texto);
+	if (free_text) {
+		free(texto);
+		free(original);
+	}
 }
 
 void ler_palavra(char** palavra)
@@ -47,10 +50,11 @@ void ler_palavra(char** palavra)
 	if (DEBUGGING) printf("\nPalavra invasora lida: %s\n", *palavra);
 }
 
-void ler_texto(char ** texto)
+void ler_texto(char ** texto, char**original)
 {
 	if ((*texto = (char*)calloc(INITIAL_TXT_SIZE+1, sizeof(char))) == NULL) exit(1);
-
+	if ((*original = (char*)calloc(INITIAL_TXT_SIZE+1, sizeof(char))) == NULL) exit(1);
+	
 	char c;
 	int i = 0;
 	int offset = 'a'-'A';
@@ -59,10 +63,14 @@ void ler_texto(char ** texto)
 		if (c == '\n' || c == '\r') continue;
 		if (i == INITIAL_TXT_SIZE) // precisa realocar
 		{
-			*texto = (char*)realloc(*texto, (i+2)*sizeof(char));
+			*texto = (char*)realloc(*texto, (i+3)*sizeof(char));
+			*original = (char*)realloc(*original, (i+3)*sizeof(char));
+			(*original)[i+1] = 0;
+			(*texto)[i+1] = 0;
 		}
 		
 		// padroniza para lowercase
+		(*original)[i] = c;
 		if (c <= 'Z' && c >= 'A') c += offset;
 		(*texto)[i++] = c;
 	}
@@ -71,7 +79,7 @@ void ler_texto(char ** texto)
 }
 
 /* Cicla palavra por palavra, comparando com palavra invasora. */
-void filtrar_palavra_invasora(char ** texto, char **palavra, int * free_text)
+void filtrar_palavra_invasora(char ** texto, char ** original, char **palavra, int * free_text)
 {
 	int contador_de_palavras =0;
 	int i = 0;
@@ -127,6 +135,9 @@ void filtrar_palavra_invasora(char ** texto, char **palavra, int * free_text)
 			for (;;)
 			{
 				char f = (*texto)[o+tamanho_palavra];
+				char ori = (*original)[o+tamanho_palavra];
+
+				(*original)[o-1] = ori;
 				(*texto)[(o++)-1] = f;
 				if (DEBUGGING && (f==0)) printf("\nFim adicionado: %d\n", f);
 
@@ -151,7 +162,7 @@ void filtrar_palavra_invasora(char ** texto, char **palavra, int * free_text)
 
 void printar_texto(char **texto)
 {
-	if (DEBUGGING) printf("\nPrintando texto final:\n");
+	if (DEBUGGING) printf("\nPrintando texto final:\n\n");
 	int i = 0;
 	for (;;)
 	{
