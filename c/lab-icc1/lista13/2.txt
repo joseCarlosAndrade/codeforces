@@ -1,0 +1,4 @@
+CAPS LOCK 
+caps lock
+lower case
+UPPER CASE

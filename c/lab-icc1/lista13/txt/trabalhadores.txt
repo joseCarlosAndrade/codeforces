@@ -1,0 +1,13 @@
+3
+Joao 
+22 
+Estagiario 
+1500
+Ana 
+40 
+Engenheira_de_Software
+700
+Maria 
+32
+Gerente
+5000
