@@ -1,0 +1,41 @@
+palestra por prof eduardo do valle simoes
+
+robotica bioinspirada e swarm intelligence.
+
+exemplo de cruzamento robotico , criaçao de um "cromossomo" para o filho (nada mais que um vetor que especifica as configuraçoes do novo filho)
+no caso, o corpo da femea é cedido para incorporar as novas configuraçoes do robo
+
+
+mutaçao deve ocorrer
+
+
+proposta nova do professor:
+ao inves de vender a melhor evoluçao para o cliente, vender o sistema evolutivo. Assim, a evoluçao continua na fabrica
+
+contou exemplo em uma empresa que construiu: um sistema evolutivo ajustava a curva de temperatura do forno para nao danificar as peças de ceramica. As configuraçoes so funcionavam para tal forno, pq foram evoluidas para tal. 
+
+
+controle evolutivo: objetivos
+faz uma liista de possibilidades que podem acontecer
+
+especificar o que é desejado do robo, sem definir como ele deve fazer
+
+a ideia é non-bias, nao influenciar na solucao, pois senao é provavel que indiquemos um caminho que ja sabemos a soluçao, a qual provavelmente nao é a melhor soluçao
+
+
+algoritmo
+1: gerar populaçao -> 2: fase de avaliaçao, avaliando um por um ao jogar-los no problema (ambiente)-> 3:condiçao de termino do experimento alcançada? (na pratica nunca finaliza, pois sempre da pra evoluir) -> 4: seleçao dos robos de melhor performance -> 5: geraçao da nova populaçao de robos atraves de crossover (troca de informaçoes) -> 6: mutaçao dos novos robots ->volta para avaliaçao
+
+para escapar de um maximo local, podemos aumentar a taxa de mutaçao, preservando ou nao o melhor
+
+
+a ideia moderna é nao desligar o sistema evolutivo complexo, e sim deixa-lo rodando a todo tempo
+
+
+exemplificou os metodos e as simulações em que ag foi aplicado
+
+
+swarms sao varios ags que se comunicam
+
+nao tem relaçao direta com o que queremos e o que estamos programando. De acordo com simoes, é impossivel programar um swarm diretamente
+
