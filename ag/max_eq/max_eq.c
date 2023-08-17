@@ -35,9 +35,12 @@ void fazer_mutacao(populacao * populacao_atual);
 
 int main(void)
 {
+	// randomizacao
 	long ltime = time(NULL);
 	int stime = (unsigned) ltime/2;
 	srand(stime);
+
+	float ultimo_melhor_individuo = -10000;
 	// gerar populacao inicial
 	
 	populacao popul;
@@ -58,8 +61,11 @@ int main(void)
 		// avaliacao do fitness
 		float melhor_individuo = avaliar_fitness(popul);
 	
-		// condicao de parada (para nao rodar infinitamente)
-		if (((melhor_individuo-10)*(melhor_individuo-10)) < 0.01) break;
+		// condicao de parada (para nao rodar infinitamente) - caso nao haja mudanca significativa
+		if ((melhor_individuo-ultimo_melhor_individuo)*(melhor_individuo-ultimo_melhor_individuo) < 0.00001) break;
+		//if (((melhor_individuo-10)*(melhor_individuo-10)) < 0.01) break;
+		ultimo_melhor_individuo = melhor_individuo;
+
 		// crossover (gerar novos individuos baseados a partir do melhor)
 		fazer_crossover(melhor_individuo, &popul);
 
@@ -118,7 +124,7 @@ void fazer_crossover(float melhor_individuo, populacao * populacao_atual)
 /* Faz mutacao em todos os individuos*/
 void fazer_mutacao(populacao * populacao_atual)
 {
-	float fator_mutacao = 0.4;
+	float fator_mutacao = 0.8;
 
 	for (int i = 0; i < MAX_POPULATION; i++)
 	{
