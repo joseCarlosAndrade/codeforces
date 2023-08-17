@@ -3,7 +3,7 @@ import threading
 
 HEADER = 64 # fixed initial header for our protocol that tells the amount of byte (size) of the message the client is going to receive
 
-PORT = 5050
+PORT = 8080 
 SERVER = socket.gethostbyname(socket.gethostname())
 
 ADDR = (SERVER, PORT) # information must be tuple
