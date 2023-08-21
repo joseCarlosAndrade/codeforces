@@ -32,7 +32,7 @@ class State:
     def eventOp(operation : int, data :str = ""):
         '''
         Handles the event list operation and it's layed like:\n
-            -1 -> prints all events \n
+            -1 -> return an array with all th events \n
             0 -> add operation; param: str (event)\n
             1 -> remove operation; param: str (event)\n
             2 -> checks if event (str) is in event list\n
@@ -94,44 +94,45 @@ class State:
     #     return cls.__doc__
 
 
+if __name__ == "__main__":
+
+    class StateOne(State):
+        '''
+        StateOne documentation
+        '''
+        def __init__(self, name) -> None:
+            super().__init__(name)
+
+        def event(self):
+            # conditions
+            pass
+
+    class StateTwo(State):
+        def __init__(self, name="") -> None:
+            super().__init__(name)
 
 
-class StateOne(State):
+
+
+    a = StateOne("flying")
+    b = StateTwo("landing")
+    print(a, b)
+    a.eventOp(0, "reached") 
+    a.eventOp(0, "on_base") 
+    print(a.eventOp(-1))
+    b.eventOp(0, "landed")
+    print(b.eventOp(-1))
+    b.eventOp(2)
+    print(a.eventOp(-1))
+
+    if a == 'StateOne':
+        print(f"igual: {a}")
+    else:
+        print('not')
     '''
-    StateOne documentation
+    Output:
+    >>> StateOne StateTwo
+    >>> ['reached', 'on_base']
+    >>> ['reached', 'on_base', 'landed']
+    >>> ['reached', 'on_base']
     '''
-    def __init__(self, name) -> None:
-        super().__init__(name)
-
-    def event(self):
-        # conditions
-        pass
-
-class StateTwo(State):
-    def __init__(self, name="") -> None:
-        super().__init__(name)
-
-
-
-a = StateOne("flying")
-b = StateTwo("landing")
-print(a, b)
-a.eventOp(0, "reached") 
-a.eventOp(0, "on_base") 
-print(a.eventOp(-1))
-b.eventOp(0, "landed")
-print(b.eventOp(-1))
-b.eventOp(2)
-print(a.eventOp(-1))
-
-if a == 'StateOne':
-    print(f"igual: {a}")
-else:
-    print('not')
-'''
-Output:
->>> StateOne StateTwo
->>> ['reached', 'on_base']
->>> ['reached', 'on_base', 'landed']
->>> ['reached', 'on_base']
-'''
