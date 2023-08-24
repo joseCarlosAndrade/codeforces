@@ -1,7 +1,10 @@
 #include<stdio.h>
 #include<GL/glew.h>
 
-#define 
+// #define TRIANGLE 0
+// #define SQUARE 1
+// #define CIRCLE 2
+#define CIRCLE_VERTICES 73
 
 #define GLFW_INCLUDE_NONE
 #include<GLFW/glfw3.h>
@@ -14,9 +17,12 @@ typedef struct {
 	float x, y;
 } coordinates;
 
+// CALLBACK KEY
+GLFWkeyfun callback_key(GLFWwindow* window, int key, int scancode, int action, int mods);
+
 int main( int argc, char ** argv)
 {
-
+	
 	glfwInit();
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // sets window visibility to false so it loads correctly before showing up
 
@@ -39,7 +45,7 @@ int main( int argc, char ** argv)
 	const GLchar* fragment_code =
 	"uniform vec4 color;\n"
 	"void main() {\n"
-	"	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n"
+	"	gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);\n"
 	"}\n"; //rgba normalized
 
 	// requiring gpu slots
@@ -96,11 +102,34 @@ int main( int argc, char ** argv)
 
 	// CREATING THE VERTICES 
 	// simple triangle:
-	coordinates vertices[3] = {
-		{-0.5f, 0.0f},
-		{0.0f, 0.5f},
-		{0.5f, 0.0f}
-	};
+	// coordinates vertices[3] = {
+	// 	{-0.5f, 0.0f},
+	// 	{0.0f, 0.5f},
+	// 	{0.5f, 0.0f}
+	// };
+
+	// square
+	// coordinates vertices[4] = {
+	// 	{ -0.50f, -0.50f},
+	// 	{ +0.50f, -0.50f},
+	// 	{ -0.50f, +0.50f},
+	// 	{ +0.50f, +0.50f}
+	// };
+
+	// circle
+	coordinates vertices[CIRCLE_VERTICES];
+	float radius = 0.5f;
+	float pi = 3.141592f;
+	float di = 2*pi / CIRCLE_VERTICES;
+	
+	for (int i = 0; i < CIRCLE_VERTICES; i++ ) {
+
+		vertices[i].x = radius * cos(i * di);
+		vertices[i].y = radius * sin(i * di);
+
+		vertices[i+1].x = radius * cos((i+1) * di);
+		vertices[i+1].y = radius * sin((i+1) * di);
+	}
 
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
@@ -114,16 +143,32 @@ int main( int argc, char ** argv)
 
 	glfwShowWindow(window);
 
+	glfwSetKeyCallback(window, callback_key);
+
 	while(!glfwWindowShouldClose(window))
 	{
 		glfwPollEvents();
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClearColor(1.0, 1.0, 1.0, 1.0);
+		// glColor3f(0.5f, 1.0f, 0.f);
 
-		glDrawArrays(GL_TRIANGLES, 0, 32);
+		// glDrawArrays(GL_TRIANGLES, 0, 32);
+		// glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, CIRCLE_VERTICES);
+		
 
 		glfwSwapBuffers(window);
 	}
 
+	glfwDestroyWindow(window);
 
+	glfwTerminate();
+	exit(EXIT_SUCCESS);
+
+}
+
+
+GLFWkeyfun callback_key(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	printf("Key pressed: %d; Scancode pressed: %d; action: %d; mods: %d\n", key, scancode, action, mods);
 }
