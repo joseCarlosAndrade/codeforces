@@ -1,0 +1,9 @@
+CFLAGS=-std-c99 -Wall -march=native
+
+programName: depends1.o depends2.o
+	gcc -o programName depends1.o depends2.o
+depends1.o: depends1.c depends1.h
+	gcc $(CFLAGS) -c depends1.c
+depends2.o: depends2.c depends2.h
+	gcc $(CFLAGS) -c depends2.c
+
