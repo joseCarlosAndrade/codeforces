@@ -32,8 +32,20 @@ Game * initialize_game();
 */
 int put_piece(Game * game, int pos);
 
+/* Checks the current board to detect the next game state, being `ON`, `VICTORY`, `TIE`.
+If needed, its `game_status` attribute is changed.
+
+@param[in] game Game board */
 void check_game_state(Game* game);
 
+/* Prints the board in plain ASCII (for human playing).
+@param[in] game Game board */
 void print_board(Game *game);
+
+/* Get the board as an array of -1, 0 and 1 (O, nothing and X, respectively)
+
+@param[in] game Game board 
+@return int[9] An array that represents the current state of the board */
+int * get_board(Game *game);
 
 #endif

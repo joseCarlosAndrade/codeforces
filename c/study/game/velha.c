@@ -2,8 +2,6 @@
 #include<stdio.h>
 
 
-
-
 Game * initialize_game() {
     Game * game = (Game*)calloc(1, sizeof(Game));
     assert(game != NULL);
@@ -53,8 +51,8 @@ void check_game_state(Game* game) {
             return;
         }
 
-    if (game->board[2] == game->board[4] && game->board[0]!=0)
-        if (game->board[0] == game->board[6]) {
+    if (game->board[2] == game->board[4] && game->board[2]!=0)
+        if (game->board[2] == game->board[6]) {
             game->game_status = VICTORY;
             return;
         }
@@ -83,4 +81,8 @@ void print_board(Game * game) {
     p[game->board[7]+1],
     p[game->board[8]+1]
     );
+}
+
+int * get_board(Game *game) {
+    return game->board;
 }
