@@ -21,13 +21,17 @@ int lastTime;
 
 int calculateFps();
 void update(SDL_Window*window);
-void input(SnakeGame::Snake &snake);
+void input(SnakeGame::Snake &snake, SnakeGame::Direction &direction);
 void draw(SDL_Renderer * renderer, SDL_Window *window, SnakeGame::Snake * snake);
+void drawSnakes(SDL_Renderer * renderer, int step, SnakeGame::Snake * snake);
 
 int main () {
     running = 1;
     fullscreen = 0;
     lastTime = 0;
+    int drawTimer = 0;
+    int snakeTimer = 0, lastSnakeTimer = 0;
+    int first = 1;
     
     SDL_Renderer * renderer;
     SDL_Window *window;
@@ -44,19 +48,27 @@ int main () {
     // draw_background(renderer, window);
     // draw_rec_background(renderer);
 
-    SnakeGame::Snake* snake =  new SnakeGame::Snake(10, 10, W_SQUARES, H_SQUARES);
+    SnakeGame::Snake* snake =  new SnakeGame::Snake(10, 10, W_SQUARES, H_SQUARES, true);    
+    SnakeGame::Direction direction = snake->getSnakeDir();
 
     while(running) {
-        
+        snakeTimer++;
         int fps = calculateFps();
         std::cout << fps << std::endl;
 
         // draw(renderer, window);
-        input(*snake);
+        input(*snake, direction);
         update(window);
+
+        if (snakeTimer - lastSnakeTimer >= fps/6)
+        {
+            snake->checkCollision();
+            snake->setSnakeDirection(direction);
+            snake->moveAllSnakes();
+            lastSnakeTimer = snakeTimer;
+        }
         draw(renderer, window, snake);
-        snake->moveSnake();
-        
+       
     }
 
     // closing all
@@ -87,7 +99,7 @@ void update(SDL_Window*window) {
     if(!fullscreen) SDL_SetWindowFullscreen(window, 0);
 }
 
-void input(SnakeGame::Snake &snake) {
+void input(SnakeGame::Snake &snake, SnakeGame::Direction &direction) {
     SDL_Event e;
     while(SDL_PollEvent(&e)) {
        if (e.type == SDL_QUIT) running= false;
@@ -96,10 +108,11 @@ void input(SnakeGame::Snake &snake) {
        if (keystates[SDL_SCANCODE_ESCAPE]) running =false;
        
     //    if(keystates[SDL_SCANCODE_F11]) fullscreen = !fullscreen;
-        if (keystates[SDL_SCANCODE_UP]) snake.setSnakeDirection(SnakeGame::UP);
-        if (keystates[SDL_SCANCODE_RIGHT]) snake.setSnakeDirection(SnakeGame::RIGHT);
-        if (keystates[SDL_SCANCODE_LEFT]) snake.setSnakeDirection(SnakeGame::LEFT);
-        if (keystates[SDL_SCANCODE_DOWN]) snake.setSnakeDirection(SnakeGame::DOWN);
+        if (keystates[SDL_SCANCODE_UP] && snake.getSnakeDir() != SnakeGame::DOWN) direction = SnakeGame::UP;
+        else if (keystates[SDL_SCANCODE_RIGHT]&& snake.getSnakeDir() != SnakeGame::LEFT) direction = SnakeGame::RIGHT;
+        else if (keystates[SDL_SCANCODE_LEFT]&& snake.getSnakeDir() != SnakeGame::RIGHT) direction = SnakeGame::LEFT;
+        else if (keystates[SDL_SCANCODE_DOWN]&& snake.getSnakeDir() != SnakeGame::UP) direction = SnakeGame::DOWN;
+        else if (keystates[SDL_SCANCODE_SPACE]) snake.addSnake();
 
         if (e.type == SDL_KEYDOWN)
         std::cout << SDL_GetKeyName(e.key.keysym.sym) << std::endl ;
@@ -110,6 +123,7 @@ void input(SnakeGame::Snake &snake) {
 
 
 void draw(SDL_Renderer*renderer, SDL_Window*window, SnakeGame::Snake *snake) {
+
     SDL_SetRenderDrawColor(renderer, 40, 40, 40, 0);
 
     SDL_Rect rect;
@@ -136,18 +150,28 @@ void draw(SDL_Renderer*renderer, SDL_Window*window, SnakeGame::Snake *snake) {
             SDL_RenderDrawRect(renderer, &rect);
         }
     }
+    drawSnakes(renderer, step, snake);
 
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    SDL_Rect snake_r;
-    snake_r.w = snake_r.h = (int)UNIVERSAL_W;
-    snake_r.x = snake->getX() * step + UNIVERSAL_W/5;
-    snake_r.y = snake->getY() * step + UNIVERSAL_W/5;
-    SDL_RenderFillRect(renderer, &snake_r);
 
     SDL_RenderPresent(renderer);
 }
 
 
+void drawSnakes(SDL_Renderer * renderer, int step, SnakeGame::Snake * snake) {
+        
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_Rect snake_r;
+        snake_r.w = snake_r.h = (int)UNIVERSAL_W;
+        snake_r.x = snake->getX() * step + UNIVERSAL_W/5;
+        snake_r.y = snake->getY() * step + UNIVERSAL_W/5;
+        SDL_RenderFillRect(renderer, &snake_r);
+
+        if (snake->nxtSnake == NULL) return;
+
+        drawSnakes(renderer, step, snake->nxtSnake);
+        // std::cout << " drawing one piece" ;
+
+}
 
 
 /*

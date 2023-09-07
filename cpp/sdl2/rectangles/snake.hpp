@@ -14,15 +14,25 @@ namespace SnakeGame
         private:
             int x, y, maxW, maxH;
             Direction snakeDirection;
+            
+            bool isHead;
+
+            void moveSnake();
 
         public:
-            Snake(int x, int y, int maxW, int maxH);
+            Snake * nxtSnake;
+
+            Snake(int x, int y, int maxW, int maxH, bool isHead);
 
             int getX();
             int getY(); 
             void setSnakePosition(int x, int y);
             void setSnakeDirection(Direction direction);
-            void moveSnake();
+            Direction getSnakeDir();
+            void moveAllSnakes();
+            void addSnake();
+
+            void checkCollision();
     };
 
     class Food : GameObject {
