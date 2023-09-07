@@ -22,8 +22,9 @@ int lastTime;
 int calculateFps();
 void update(SDL_Window*window);
 void input(SnakeGame::Snake &snake, SnakeGame::Direction &direction);
-void draw(SDL_Renderer * renderer, SDL_Window *window, SnakeGame::Snake * snake);
-void drawSnakes(SDL_Renderer * renderer, int step, SnakeGame::Snake * snake);
+void draw(SDL_Renderer * renderer, SDL_Window *window, SnakeGame::Snake * snake, SnakeGame::Food*food);
+void drawSnakes(SDL_Renderer * renderer, int step, SnakeGame::Snake * snake, int i);
+void drawFood(SDL_Renderer * renderer, int step, SnakeGame::Food*food);
 
 int main () {
     running = 1;
@@ -32,6 +33,7 @@ int main () {
     int drawTimer = 0;
     int snakeTimer = 0, lastSnakeTimer = 0;
     int first = 1;
+
     
     SDL_Renderer * renderer;
     SDL_Window *window;
@@ -50,6 +52,7 @@ int main () {
 
     SnakeGame::Snake* snake =  new SnakeGame::Snake(10, 10, W_SQUARES, H_SQUARES, true);    
     SnakeGame::Direction direction = snake->getSnakeDir();
+    SnakeGame::Food *food = new SnakeGame::Food(2, 2);
 
     while(running) {
         snakeTimer++;
@@ -60,14 +63,16 @@ int main () {
         input(*snake, direction);
         update(window);
 
-        if (snakeTimer - lastSnakeTimer >= fps/6)
+        if (snakeTimer - lastSnakeTimer >= fps/6 && snakeTimer > FPS + 5 && snake->state!=SnakeGame::DEAD)
         {
-            snake->checkCollision();
+            
             snake->setSnakeDirection(direction);
             snake->moveAllSnakes();
+            snake->checkCollision(food);
             lastSnakeTimer = snakeTimer;
+            if (snake->state==SnakeGame::DEAD)snake->changeAllStates();
         }
-        draw(renderer, window, snake);
+        draw(renderer, window, snake, food);
        
     }
 
@@ -122,7 +127,7 @@ void input(SnakeGame::Snake &snake, SnakeGame::Direction &direction) {
 
 
 
-void draw(SDL_Renderer*renderer, SDL_Window*window, SnakeGame::Snake *snake) {
+void draw(SDL_Renderer*renderer, SDL_Window*window, SnakeGame::Snake *snake, SnakeGame::Food*food) {
 
     SDL_SetRenderDrawColor(renderer, 40, 40, 40, 0);
 
@@ -150,16 +155,32 @@ void draw(SDL_Renderer*renderer, SDL_Window*window, SnakeGame::Snake *snake) {
             SDL_RenderDrawRect(renderer, &rect);
         }
     }
-    drawSnakes(renderer, step, snake);
+    drawSnakes(renderer, step, snake, 0);
 
+    drawFood(renderer, step, food);
 
     SDL_RenderPresent(renderer);
 }
 
+void drawFood(SDL_Renderer * renderer, int step, SnakeGame::Food*food) {
+    SDL_SetRenderDrawColor(renderer, 230, 0, 50, 255);
+    SDL_Rect food_r;
+    food_r.w = food_r.h = (int)UNIVERSAL_W;
+    food_r.x = food->x * step + UNIVERSAL_W/5;
+    food_r.y = food->y * step + UNIVERSAL_W/5;
+    SDL_RenderFillRect(renderer, &food_r);
+}
 
-void drawSnakes(SDL_Renderer * renderer, int step, SnakeGame::Snake * snake) {
-        
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+
+void drawSnakes(SDL_Renderer * renderer, int step, SnakeGame::Snake * snake, int i) {
+        if (i > 100) i = 100;
+    
+        if(snake->state==SnakeGame::ALIVE)
+            SDL_SetRenderDrawColor(renderer, 0 + i*0.7, 255 - snake->isHead*30 - i*1.5, 0 + snake->isHead*70, 255);
+    
+        else if (snake->state==SnakeGame::DEAD)
+            SDL_SetRenderDrawColor(renderer, 255 - i*0.7, 0, 0 + snake->isHead*70, 255);
+
         SDL_Rect snake_r;
         snake_r.w = snake_r.h = (int)UNIVERSAL_W;
         snake_r.x = snake->getX() * step + UNIVERSAL_W/5;
@@ -168,7 +189,7 @@ void drawSnakes(SDL_Renderer * renderer, int step, SnakeGame::Snake * snake) {
 
         if (snake->nxtSnake == NULL) return;
 
-        drawSnakes(renderer, step, snake->nxtSnake);
+        drawSnakes(renderer, step, snake->nxtSnake, ++i);
         // std::cout << " drawing one piece" ;
 
 }

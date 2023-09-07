@@ -1,12 +1,30 @@
 #include"snake.hpp"
+#include<ctime>
+#include<cstdlib>
+
+int SnakeGame::GameObject::getX() {
+    return this->x;
+}
+
+int SnakeGame::GameObject::getY() {
+    return this->y;
+}
+
+void SnakeGame::GameObject::setPosition(int x, int y) {
+    this->x = x;
+    this->y = y;
+    
+}
+
 
 SnakeGame::Snake::Snake(int x, int y, int maxW, int maxH, bool isHead) {
     // sets initial position
-    Snake::setSnakePosition(x, y);
+    Snake::setPosition(x, y);
     this->maxH = maxH;
     this->maxW = maxW;
     this->snakeDirection = RIGHT;
     this->isHead = isHead;
+    this->state = SnakeGame::ALIVE;
 
     if (isHead)
         this->nxtSnake = new SnakeGame::Snake(x-1, y, maxW, maxH, false);
@@ -16,19 +34,6 @@ SnakeGame::Snake::Snake(int x, int y, int maxW, int maxH, bool isHead) {
 
 }
 
-int SnakeGame::Snake::getX() {
-    return this->x;
-}
-
-int SnakeGame::Snake::getY() {
-    return this->y;
-}
-
-void SnakeGame::Snake::setSnakePosition(int x, int y) {
-    this->x = x;
-    this->y = y;
-    
-}
 
 void SnakeGame::Snake::setSnakeDirection(Direction direction) {
     this->snakeDirection = direction;
@@ -53,22 +58,22 @@ void SnakeGame::Snake::moveSnake() {
     switch (this->snakeDirection)
     {
     case RIGHT:
-        if (this->x == this->maxW-1) return;
+        if (this->x == this->maxW-1)  {this->state = DEAD ;return;};
             this->x++;
         break;
     
     case UP:
-        if (this->y ==0) return;
+        if (this->y ==0) {this->state = DEAD ;return;};
             this->y--;
         break;
     
     case LEFT:
-        if (this->x ==0) return;
+        if (this->x ==0) {this->state = DEAD ;return;};
         this->x--;
         break;
 
     case DOWN:
-        if (this->y == this->maxH-1) return;
+        if (this->y == this->maxH-1) {this->state = DEAD ;return;};
         // std::cout << this->y << " " << this->maxH-1<< std::endl;
         this->y++;
         break;
@@ -109,8 +114,39 @@ void SnakeGame::Snake::addSnake() {
     }
 }
 
-void SnakeGame::Snake::checkCollision() {
+SnakeGame::SnakeState SnakeGame::Snake::checkCollision(SnakeGame::Food* food) {
+    // checks collision between its body
+    // checks collision between food and snake    
 
+    if (this->isHead && this->x == food->x && this->y == food->y) {
+        this->addSnake();
+        std::srand(std::time(nullptr));
+        int x = std::rand() % this->maxW;
+        int y = std::rand() % this->maxH;
+        food->setPosition(x, y);
+    }
+    SnakeGame::Snake* t_snake = this;
+    do {
+        t_snake = t_snake->nxtSnake;
+        if (this->isHead&& this->x == t_snake->x && this->y== t_snake->y) {
+            this->state = DEAD;
+            return SnakeGame::DEAD;
+        }
+        
+    } while (t_snake->nxtSnake != NULL);
+
+    return SnakeGame::ALIVE;
+}
+
+void SnakeGame::Snake::changeAllStates() {
+    this->state = SnakeGame::DEAD;
+    if (this->nxtSnake != NULL) this->nxtSnake->changeAllStates();
 }
 
 // implement my own queue 
+
+SnakeGame::Food::Food(int x, int y) {
+    this->x = x;
+    this->y = y;
+}
+

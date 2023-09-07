@@ -5,38 +5,49 @@
 namespace SnakeGame 
 {
     typedef enum e_snake_direction {UP, DOWN, LEFT, RIGHT} Direction;
+    typedef enum e_snake_state {ALIVE, DEAD, VICTORY} SnakeState;
 
     class GameObject {
-        std::string name;
+        private:
+        
+            std::string name;
+
+        public:
+            int x, y;
+            int getX();
+            int getY(); 
+            void setPosition(int x, int y);
+            
     };
 
-    class Snake : GameObject {
-        private:
-            int x, y, maxW, maxH;
-            Direction snakeDirection;
+    class Food : public GameObject {
+        public:
+            Food(int x, int y);
             
-            bool isHead;
+    };
 
+    class Snake : public GameObject {
+        private:
+            int maxW, maxH;
+            Direction snakeDirection;
             void moveSnake();
 
         public:
             Snake * nxtSnake;
+            bool isHead;
+            SnakeState state;
 
             Snake(int x, int y, int maxW, int maxH, bool isHead);
 
-            int getX();
-            int getY(); 
             void setSnakePosition(int x, int y);
             void setSnakeDirection(Direction direction);
             Direction getSnakeDir();
             void moveAllSnakes();
             void addSnake();
+            void changeAllStates();
 
-            void checkCollision();
-    };
-
-    class Food : GameObject {
-
+            SnakeState checkCollision(SnakeGame::Food *food);
+            
     };
 
 }
