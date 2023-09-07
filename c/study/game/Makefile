@@ -7,4 +7,4 @@ run:
 	./bin/main
 
 clean: 
-	rm main
+	rm bin/main
