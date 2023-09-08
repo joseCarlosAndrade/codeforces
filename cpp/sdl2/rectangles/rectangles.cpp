@@ -1,5 +1,7 @@
 #include<SDL2/SDL.h>
 #include<iostream>
+#include<ctime>
+#include<cstdlib>
 
 #include"snake.hpp"
 
@@ -43,26 +45,27 @@ int main () {
     // to let it resizable SDL_WINDOW_RESIZABLE ord
     if(SDL_CreateWindowAndRenderer(WIDTH, HEIGHT,  SDL_RENDERER_ACCELERATED, &window, &renderer) < 0) std::cout << "Failed to create window and renderer" << std::endl;
 
-    SDL_SetWindowTitle(window, "my little window");
+    SDL_SetWindowTitle(window, "my little snake");
     SDL_ShowCursor(SDL_TRUE);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
-    
-    // draw_background(renderer, window);
-    // draw_rec_background(renderer);
-
+    -
     SnakeGame::Snake* snake =  new SnakeGame::Snake(10, 10, W_SQUARES, H_SQUARES, true);    
     SnakeGame::Direction direction = snake->getSnakeDir();
-    SnakeGame::Food *food = new SnakeGame::Food(2, 2);
+    std::srand(std::time(nullptr));
+     
+    SnakeGame::Food *food = new SnakeGame::Food(std::rand() % W_SQUARES, std::rand() % H_SQUARES);
 
     while(running) {
         snakeTimer++;
         int fps = calculateFps();
-        std::cout << fps << std::endl;
+        // std::cout << fps << std::endl;
 
-        // draw(renderer, window);
+   
         input(*snake, direction);
         update(window);
 
+        // the game runs at 30 fps, but the snake moves at 5
+        // this makes the input logic a lot smoother while maintaining a pleasant snake speed
         if (snakeTimer - lastSnakeTimer >= fps/6 && snakeTimer > FPS + 5 && snake->state!=SnakeGame::DEAD)
         {
             
@@ -82,6 +85,7 @@ int main () {
     SDL_Quit();
 }
 
+// fancy math to get fps 
 int calculateFps() {
     lastFrame = SDL_GetTicks();
         if (lastFrame >= lastTime+1000) {
@@ -99,25 +103,24 @@ int calculateFps() {
         return fps;
 }
 
+// updates screen information when requested
 void update(SDL_Window*window) {
     if(fullscreen) SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
     if(!fullscreen) SDL_SetWindowFullscreen(window, 0);
 }
 
+// handle all inputs events
 void input(SnakeGame::Snake &snake, SnakeGame::Direction &direction) {
     SDL_Event e;
     while(SDL_PollEvent(&e)) {
-       if (e.type == SDL_QUIT) running= false;
-
-       const Uint8*keystates = SDL_GetKeyboardState(NULL);
-       if (keystates[SDL_SCANCODE_ESCAPE]) running =false;
+        if (e.type == SDL_QUIT) running= false; 
+        const Uint8*keystates = SDL_GetKeyboardState(NULL);
+        if (keystates[SDL_SCANCODE_ESCAPE]) running =false;
        
-    //    if(keystates[SDL_SCANCODE_F11]) fullscreen = !fullscreen;
         if (keystates[SDL_SCANCODE_UP] && snake.getSnakeDir() != SnakeGame::DOWN) direction = SnakeGame::UP;
-        else if (keystates[SDL_SCANCODE_RIGHT]&& snake.getSnakeDir() != SnakeGame::LEFT) direction = SnakeGame::RIGHT;
-        else if (keystates[SDL_SCANCODE_LEFT]&& snake.getSnakeDir() != SnakeGame::RIGHT) direction = SnakeGame::LEFT;
-        else if (keystates[SDL_SCANCODE_DOWN]&& snake.getSnakeDir() != SnakeGame::UP) direction = SnakeGame::DOWN;
-        else if (keystates[SDL_SCANCODE_SPACE]) snake.addSnake();
+        else if (keystates[SDL_SCANCODE_RIGHT] && snake.getSnakeDir() != SnakeGame::LEFT) direction = SnakeGame::RIGHT;
+        else if (keystates[SDL_SCANCODE_LEFT] && snake.getSnakeDir() != SnakeGame::RIGHT) direction = SnakeGame::LEFT;
+        else if (keystates[SDL_SCANCODE_DOWN] && snake.getSnakeDir() != SnakeGame::UP) direction = SnakeGame::DOWN;
 
         if (e.type == SDL_KEYDOWN)
         std::cout << SDL_GetKeyName(e.key.keysym.sym) << std::endl ;
@@ -126,7 +129,7 @@ void input(SnakeGame::Snake &snake, SnakeGame::Direction &direction) {
 }
 
 
-
+// main draw function
 void draw(SDL_Renderer*renderer, SDL_Window*window, SnakeGame::Snake *snake, SnakeGame::Food*food) {
 
     SDL_SetRenderDrawColor(renderer, 40, 40, 40, 0);
@@ -139,11 +142,10 @@ void draw(SDL_Renderer*renderer, SDL_Window*window, SnakeGame::Snake *snake, Sna
 
     SDL_SetRenderDrawColor(renderer, 200, 200, 200, 255);
  
-    // SDL_Rect rect;
-
+    // it automates the square distribution based on the settings specified on the define area
+    // trust me it works
     int step = (int)(6*UNIVERSAL_W)/5 ;
 
-    // rect.x = rect.y = step;
     rect.w = rect.h = (int)UNIVERSAL_W;
 
     for ( int i = 0; i <= W_SQUARES; i++) {
@@ -171,7 +173,7 @@ void drawFood(SDL_Renderer * renderer, int step, SnakeGame::Food*food) {
     SDL_RenderFillRect(renderer, &food_r);
 }
 
-
+// draw snakes recursively
 void drawSnakes(SDL_Renderer * renderer, int step, SnakeGame::Snake * snake, int i) {
         if (i > 100) i = 100;
     
@@ -190,30 +192,6 @@ void drawSnakes(SDL_Renderer * renderer, int step, SnakeGame::Snake * snake, int
         if (snake->nxtSnake == NULL) return;
 
         drawSnakes(renderer, step, snake->nxtSnake, ++i);
-        // std::cout << " drawing one piece" ;
 
 }
 
-
-/*
-while (SDL_PollEvent(&event)) {
-    switch (event.type) {
-        // Handle non-input stuff here like SDL_QUIT
-        // Since you're using the other API, ignore keyboard events
-    }
-}
-
-const Uint8* kb = SDL_GetKeyboardState(NULL);
-
-shootDirectionY = -kb[SDL_SCANCODE_UP] + kb[SDL_SCANCODE_DOWN];
-shootDirectionX = -kb[SDL_SCANCODE_LEFT] + kb[SDL_SCANCODE_RIGHT]
-
-moveDirectionY = -kb[SDL_SCANCODE_W] + kb[SDL_SCANCODE_S];
-moveDirectionX = -kb[SDL_SCANCODE_A] + kb[SDL_SCANCODE_D];
-*/
-
-
-
-/* 
-array of rects , spaced by some pixels to fill the backgound
-*/

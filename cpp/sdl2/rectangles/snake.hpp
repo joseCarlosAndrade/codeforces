@@ -7,6 +7,7 @@ namespace SnakeGame
     typedef enum e_snake_direction {UP, DOWN, LEFT, RIGHT} Direction;
     typedef enum e_snake_state {ALIVE, DEAD, VICTORY} SnakeState;
 
+    // parent class that is inherited by all game objects. It provides general pourpose functions and vars
     class GameObject {
         private:
         
@@ -45,7 +46,7 @@ namespace SnakeGame
             void moveAllSnakes();
             void addSnake();
             void changeAllStates();
-
+            bool isCollidingBody(int x, int y) ;
             SnakeState checkCollision(SnakeGame::Food *food);
             
     };

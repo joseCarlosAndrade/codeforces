@@ -16,7 +16,6 @@ void SnakeGame::GameObject::setPosition(int x, int y) {
     
 }
 
-
 SnakeGame::Snake::Snake(int x, int y, int maxW, int maxH, bool isHead) {
     // sets initial position
     Snake::setPosition(x, y);
@@ -121,8 +120,11 @@ SnakeGame::SnakeState SnakeGame::Snake::checkCollision(SnakeGame::Food* food) {
     if (this->isHead && this->x == food->x && this->y == food->y) {
         this->addSnake();
         std::srand(std::time(nullptr));
-        int x = std::rand() % this->maxW;
-        int y = std::rand() % this->maxH;
+        int x, y;
+        do {  
+            x = std::rand() % this->maxW;
+            y = std::rand() % this->maxH;
+        } while (isCollidingBody(x, y));
         food->setPosition(x, y);
     }
     SnakeGame::Snake* t_snake = this;
@@ -138,6 +140,14 @@ SnakeGame::SnakeState SnakeGame::Snake::checkCollision(SnakeGame::Food* food) {
     return SnakeGame::ALIVE;
 }
 
+bool SnakeGame::Snake::isCollidingBody(int x, int y) {
+    if (this->x == x && this->y==y) return true;
+    if (this->nxtSnake == NULL) return false;
+    return this->nxtSnake->isCollidingBody(x, y);
+    // std::cout << "false " ;
+    
+}
+
 void SnakeGame::Snake::changeAllStates() {
     this->state = SnakeGame::DEAD;
     if (this->nxtSnake != NULL) this->nxtSnake->changeAllStates();
@@ -146,6 +156,8 @@ void SnakeGame::Snake::changeAllStates() {
 // implement my own queue 
 
 SnakeGame::Food::Food(int x, int y) {
+    
+
     this->x = x;
     this->y = y;
 }
