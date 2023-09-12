@@ -3,7 +3,7 @@
 #include<ctime>
 #include<cstdlib>
 
-#include"snake.hpp"
+#include"include/snake.hpp"
 
 #define WIDTH 500
 #define HEIGHT 500
@@ -48,7 +48,7 @@ int main () {
     SDL_SetWindowTitle(window, "my little snake");
     SDL_ShowCursor(SDL_TRUE);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
-    -
+    
     SnakeGame::Snake* snake =  new SnakeGame::Snake(10, 10, W_SQUARES, H_SQUARES, true);    
     SnakeGame::Direction direction = snake->getSnakeDir();
     std::srand(std::time(nullptr));

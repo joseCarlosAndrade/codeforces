@@ -1,4 +1,4 @@
-#include"snake.hpp"
+#include"include/snake.hpp"
 #include<ctime>
 #include<cstdlib>
 

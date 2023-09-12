@@ -1,0 +1,3 @@
+/home/jc_deckel13/dev-jc/cpp/opencv/build/CMakeFiles/rebuild_cache.dir
+/home/jc_deckel13/dev-jc/cpp/opencv/build/CMakeFiles/edit_cache.dir
+/home/jc_deckel13/dev-jc/cpp/opencv/build/CMakeFiles/imageBasics.dir
