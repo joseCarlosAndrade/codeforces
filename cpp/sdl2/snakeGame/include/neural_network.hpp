@@ -47,7 +47,6 @@ typedef unsigned int CONTAINER_SIZE;
 
 class NetworkContainer {
     private:
-        // SingleNetwork * _networks;
         std::vector<SingleNetwork> networks;
         CONTAINER_SIZE  n_networks;
 
@@ -76,6 +75,10 @@ class NetworkContainer {
             //     _networks[i](n_inputs, n_outputs);
             // }
         }
+        ~NetworkContainer() {
+           
+        }
+        
         void printAllNetworks () {
             std::vector<SingleNetwork>::iterator iterator;
             iterator = networks.begin();
@@ -87,6 +90,17 @@ class NetworkContainer {
 
                 iterator++;
             }
+        }    void printAllNetworks () {
+            std::vector<SingleNetwork>::iterator iterator;
+            iterator = networks.begin();
+            
+            while(iterator != networks.end()) {
+                std::cout << "Printing information on network: " << iterator - networks.begin() << std::endl
+                << "Weights: " << std::endl << iterator->getData(WEIGHTS) << std::endl <<std::endl
+                << "Bias: " << std::endl << iterator->getData(BIAS) << std::endl <<std::endl;
+
+                iterator++;
+            } 
         }
         
 };

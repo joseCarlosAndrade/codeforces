@@ -32,13 +32,14 @@ namespace SnakeGame
             int maxW, maxH;
             Direction snakeDirection;
             void moveSnake();
+            Food* thisFood;
 
         public:
             Snake * nxtSnake;
             bool isHead;
             SnakeState state;
 
-            Snake(int x, int y, int maxW, int maxH, bool isHead);
+            Snake(int x, int y, int maxW, int maxH, bool isHead, bool own_food=false, int fx = 0, int fy = 0);
 
             void setSnakePosition(int x, int y);
             void setSnakeDirection(Direction direction);

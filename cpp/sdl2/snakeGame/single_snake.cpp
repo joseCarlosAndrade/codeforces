@@ -16,6 +16,8 @@
 
 #define FPS 30
 
+//TODO: make the sdl2 rendering a separated class
+
 bool running, fullscreen;
 
 int frameCount, timerFPS, lastFrame, fps;

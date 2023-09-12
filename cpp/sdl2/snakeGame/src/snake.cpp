@@ -1,4 +1,4 @@
-#include"include/snake.hpp"
+#include"../include/snake.hpp"
 #include<ctime>
 #include<cstdlib>
 
@@ -16,7 +16,7 @@ void SnakeGame::GameObject::setPosition(int x, int y) {
     
 }
 
-SnakeGame::Snake::Snake(int x, int y, int maxW, int maxH, bool isHead) {
+SnakeGame::Snake::Snake(int x, int y, int maxW, int maxH, bool isHead, bool own_food=false, int fx = 0, int fy = 0) {
     // sets initial position
     Snake::setPosition(x, y);
     this->maxH = maxH;
@@ -31,6 +31,8 @@ SnakeGame::Snake::Snake(int x, int y, int maxW, int maxH, bool isHead) {
     else 
         this->nxtSnake = NULL;
 
+    
+    if (own_food) this->thisFood = new SnakeGame::Food(fx, fy);
 }
 
 
