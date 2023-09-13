@@ -13,7 +13,9 @@ int main(int argc, char ** argv) {
                 4, 4, 4, 4, 4,
                 5, 5, 5, 5, 5;
 
-    std::cout << matrix_a(0) << std::endl; // 1
+    std::cout << matrix_a(1) << std::endl; // 2
+    matrix_a.transposeInPlace();
+    std::cout << matrix_a(1 ) << std::endl; // 1
 
     Eigen::Matrix<float, 4, 4> A;
     A << 0, 2, 0, 0,

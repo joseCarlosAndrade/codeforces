@@ -30,9 +30,10 @@ class Game {
         std::vector<SnakeGame::Snake> snakes;
         NeuralNetwork::NetworkContainer *snakeContainer;
         int deadSnakes;
+        SnakeGame::SNAKE_VIEW_AREA snake_view;
     
     public:
-        Game(NeuralNetwork::CONTAINER_SIZE n_s, int g_height = 500, int g_width = 500, int gw_squares = 25, int gh_squares = 25) ;
+        Game(NeuralNetwork::CONTAINER_SIZE n_s, SnakeGame::SNAKE_VIEW_AREA view, int g_height = 500, int g_width = 500, int gw_squares = 25, int gh_squares = 25) ;
         ~Game();
 
         void initSnakes();

@@ -5,8 +5,8 @@
 #include"../include/SDLSnakeGameAi.hpp"
 #include<map>
 
-Game::Game(NeuralNetwork::CONTAINER_SIZE n_s, int g_height , int g_width , int gw_squares, int gh_squares ) 
-    : n_snakes(n_s), height(g_height), width(g_width), w_squares(gw_squares), h_squares(gh_squares)
+Game::Game(NeuralNetwork::CONTAINER_SIZE n_s, SnakeGame::SNAKE_VIEW_AREA view, int g_height , int g_width , int gw_squares, int gh_squares ) 
+    : n_snakes(n_s), height(g_height), width(g_width), w_squares(gw_squares), h_squares(gh_squares), snake_view(view)
     {
         // initializing container of neural networks
         snakeContainer = new NeuralNetwork::NetworkContainer(n_s, 10, 4);
@@ -38,7 +38,7 @@ Game::~Game() {
     SDL_Quit();
 }
 
-// intanciates all snakes
+// intantiates all snakes
 void Game::initSnakes() {
     // snakes boiiii (and their foods)
     std::srand(std::time(nullptr));
@@ -49,7 +49,7 @@ void Game::initSnakes() {
     for ( int i = 0; i < n_snakes; i++) {
         food_x = std::rand() % w_squares;
         food_y = std::rand() % h_squares;
-        SnakeGame::Snake c_snake(w_squares/2, h_squares/2, w_squares, h_squares, true, true, food_x, food_y);
+        SnakeGame::Snake c_snake(w_squares/2, h_squares/2, w_squares, h_squares, true, true, food_x, food_y, snake_view);
         snakes.push_back(c_snake);
     }
 }
@@ -125,7 +125,21 @@ void Game::mainLoop() {
         // this->update();
         if (snakeTimer - lastSnakeTimer >= fps/6 && snakeTimer > FPS + 5) {
             this->updateSnakes();
+            std::vector<float> in = snakes[0].getInputs();
+            int k =0 ;
+            std::cout << "what the first snake is seeing:" << std::endl <<  "distance from food x and y: ";
+            for ( int i = 0; i < snake_view*snake_view + 2; i++) {
+                
+                if ( i >1) {
+                    if(i ==2) std::cout << std::endl;
 
+                    if (k >=5) { std::cout << std::endl; k=0;}
+                    k++;
+                }
+                std::cout << in[i] << " ";
+                // if ( i%snake_view == snake_view-1) std::cout
+            }
+            std::cout << std::endl << std::endl;
             lastSnakeTimer = snakeTimer;
         }
         this->draw();
@@ -168,11 +182,11 @@ void Game::draw() {
 
     rect.w = rect.h = (int)universal_s;
 
-    for ( int i = 0; i <= w_squares; i++) {
+    for ( int i = 0; i < w_squares; i++) {
         
-        for (int j = 0 ; j <= h_squares; j++ ){
-            rect.x = step*j + universal_s/5; 
-            rect.y = step*i + universal_s/5;
+        for (int j = 0 ; j < h_squares; j++ ){
+            rect.x = step*i + universal_s/5; 
+            rect.y = step*j + universal_s/5;
         
             SDL_RenderDrawRect(renderer, &rect);
         }

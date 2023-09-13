@@ -1,11 +1,13 @@
 #ifndef SNAKE_H
 #define SNAKE_H
 #include<iostream>
+#include<vector>
 
 namespace SnakeGame 
 {
     typedef enum e_snake_direction {UP, DOWN, LEFT, RIGHT} Direction;
     typedef enum e_snake_state {ALIVE, DEAD, VICTORY} SnakeState;
+    typedef unsigned int SNAKE_VIEW_AREA;
 
     // parent class that is inherited by all game objects. It provides general pourpose functions and vars
     class GameObject {
@@ -30,16 +32,19 @@ namespace SnakeGame
     class Snake : public GameObject {
         private:
             int maxW, maxH;
+            SNAKE_VIEW_AREA snakeView;
             Direction snakeDirection;
-            void moveSnake();
             Food* thisFood;
+
+            void moveSnake();
+            bool isCollidingBody(int x, int y) ;
 
         public:
             Snake * nxtSnake;
             bool isHead;
             SnakeState state;
 
-            Snake(int x, int y, int maxW, int maxH, bool isHead, bool own_food=false, int fx = 0, int fy = 0);
+            Snake(int x, int y, int maxW, int maxH, bool isHead, bool own_food=false, int fx = 0, int fy = 0, SNAKE_VIEW_AREA view = 5);
 
             void setSnakePosition(int x, int y);
             void setSnakeDirection(Direction direction);
@@ -47,11 +52,13 @@ namespace SnakeGame
             void moveAllSnakes();
             void addSnake();
             void changeAllStates();
-            bool isCollidingBody(int x, int y) ;
+            
             SnakeState checkCollision();
             SnakeState checkCollision(SnakeGame::Food *food);
 
             Food * getFoodPtr();
+
+            std::vector<float> getInputs();
             
     };
 

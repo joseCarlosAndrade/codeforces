@@ -1,6 +1,7 @@
 #include"../include/snake.hpp"
 #include<ctime>
 #include<cstdlib>
+#include<eigen3/Eigen/Dense>
 
 int SnakeGame::GameObject::getX() {
     return this->x;
@@ -16,9 +17,16 @@ void SnakeGame::GameObject::setPosition(int x, int y) {
     
 }
 
-SnakeGame::Snake::Snake(int x, int y, int maxW, int maxH, bool isHead, bool own_food, int fx , int fy ) {
+// constructor, initializes a snake object.
+SnakeGame::Snake::Snake(int x, int y, int maxW, int maxH, bool isHead, bool own_food, int fx , int fy, SnakeGame::SNAKE_VIEW_AREA view ) 
+ {
     // sets initial position
     Snake::setPosition(x, y);
+    if (view%2==0) {
+        std::cout << "Snake view size must be an odd value. " << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    this->snakeView = view;
     this->maxH = maxH;
     this->maxW = maxW;
     this->snakeDirection = RIGHT;
@@ -35,7 +43,7 @@ SnakeGame::Snake::Snake(int x, int y, int maxW, int maxH, bool isHead, bool own_
     if (own_food) this->thisFood = new SnakeGame::Food(fx, fy);
 }
 
-
+// changes snake direction if not forbidden
 void SnakeGame::Snake::setSnakeDirection(Direction direction) {
     
 
@@ -61,10 +69,12 @@ void SnakeGame::Snake::setSnakeDirection(Direction direction) {
     this->snakeDirection = direction;
 }
 
+// returns snake direction
 SnakeGame::Direction SnakeGame::Snake::getSnakeDir() {
     return this->snakeDirection;
 }
 
+// moves the entire snake body
 void SnakeGame::Snake::moveAllSnakes() {
 
     this->moveSnake();
@@ -76,6 +86,7 @@ void SnakeGame::Snake::moveAllSnakes() {
 
 }
 
+// moves the part one block at direction && handles wall collision
 void SnakeGame::Snake::moveSnake() {
     switch (this->snakeDirection)
     {
@@ -102,6 +113,7 @@ void SnakeGame::Snake::moveSnake() {
     }
 }
 
+// adds a body part to the snake 
 void SnakeGame::Snake::addSnake() {
     if (this->nxtSnake!=NULL) this->nxtSnake->addSnake();
     if(this->nxtSnake==NULL) {
@@ -136,6 +148,7 @@ void SnakeGame::Snake::addSnake() {
     }
 }
 
+// handle collision in general for a given food
 SnakeGame::SnakeState SnakeGame::Snake::checkCollision(SnakeGame::Food* food) {
     // checks collision between its body
     // checks collision between food and snake    
@@ -163,7 +176,9 @@ SnakeGame::SnakeState SnakeGame::Snake::checkCollision(SnakeGame::Food* food) {
     return SnakeGame::ALIVE;
 }
 
+// handle collision in general for its own food (overload so it can run with multiple instances of snakes)
 SnakeGame::SnakeState SnakeGame::Snake::checkCollision() {
+    // if head touched food
     if (this->isHead && this->x == thisFood->x && this->y == thisFood->y) {
         this->addSnake();
         std::srand(std::time(nullptr));
@@ -174,11 +189,13 @@ SnakeGame::SnakeState SnakeGame::Snake::checkCollision() {
         } while (isCollidingBody(x, y));
         thisFood->setPosition(x, y);
     }
+
+    // if head touched its body
     SnakeGame::Snake* t_snake = this;
     do {
         t_snake = t_snake->nxtSnake;
         if (this->isHead&& this->x == t_snake->x && this->y== t_snake->y) {
-            this->state = DEAD;
+            this->state = SnakeGame::DEAD;
             return SnakeGame::DEAD;
         }
         
@@ -187,10 +204,12 @@ SnakeGame::SnakeState SnakeGame::Snake::checkCollision() {
     return SnakeGame::ALIVE; 
 }
 
+// returns a ptr to its food, since its a private attribute
 SnakeGame::Food * SnakeGame::Snake::getFoodPtr() {
     return thisFood;
 }
 
+// ensures that new food location is not inside the snakes body
 bool SnakeGame::Snake::isCollidingBody(int x, int y) {
     if (this->x == x && this->y==y) return true;
     if (this->nxtSnake == NULL) return false;
@@ -199,15 +218,48 @@ bool SnakeGame::Snake::isCollidingBody(int x, int y) {
     
 }
 
+// changes all body to dead
 void SnakeGame::Snake::changeAllStates() {
     this->state = SnakeGame::DEAD;
     if (this->nxtSnake != NULL) this->nxtSnake->changeAllStates();
 }
 
-// implement my own queue 
+// gets a vector of inputs to feed nn
+std::vector<float> SnakeGame::Snake::getInputs() {
+    std::vector<float> inputs;
+    inputs.push_back(thisFood->getX() - this->x ); // distance x to food
+    inputs.push_back(thisFood->getY() - this->y ); // distance y to food
 
-SnakeGame::Food::Food(int x, int y) {
+    // subtraction factor (check my notes for a better explanation!) but baically it transforms the base to the new snake_view
+    // region.
+    int d = snakeView/2; // if 5 -> v = 2
     
+    Eigen::MatrixXd mat = Eigen::MatrixXd::Zero(snakeView, snakeView);
+
+    auto thisSnake = this;
+
+    while (1)  {
+        int x_c = thisSnake->getX() - this->getX() + d;
+        int y_c = thisSnake->getY() - this->getY() + d;
+        
+        if ((x_c >= 0 && x_c < snakeView ) && (y_c >= 0 && y_c < snakeView )) mat(x_c, y_c) = 1;
+
+        if (thisSnake->nxtSnake == NULL) break;
+        thisSnake = this->nxtSnake;
+    } 
+    
+    // mat.transposeInPlace(); // transpose because eigen uses column > row order for indexing by default, which is not what i want
+    for ( int i = 0; i < snakeView*snakeView; i ++) {
+        // if (i==d*snakeView+d) continue; // skips head position, since it will always be a body part, its not necessary to feed nn with it
+        inputs.push_back(mat(i));
+    }
+
+    return inputs;
+}
+
+
+// ifood
+SnakeGame::Food::Food(int x, int y) {
 
     this->x = x;
     this->y = y;
