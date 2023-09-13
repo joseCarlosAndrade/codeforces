@@ -48,7 +48,10 @@ namespace SnakeGame
             void addSnake();
             void changeAllStates();
             bool isCollidingBody(int x, int y) ;
+            SnakeState checkCollision();
             SnakeState checkCollision(SnakeGame::Food *food);
+
+            Food * getFoodPtr();
             
     };
 

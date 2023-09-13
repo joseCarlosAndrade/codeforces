@@ -16,7 +16,7 @@ void SnakeGame::GameObject::setPosition(int x, int y) {
     
 }
 
-SnakeGame::Snake::Snake(int x, int y, int maxW, int maxH, bool isHead, bool own_food=false, int fx = 0, int fy = 0) {
+SnakeGame::Snake::Snake(int x, int y, int maxW, int maxH, bool isHead, bool own_food, int fx , int fy ) {
     // sets initial position
     Snake::setPosition(x, y);
     this->maxH = maxH;
@@ -37,6 +37,27 @@ SnakeGame::Snake::Snake(int x, int y, int maxW, int maxH, bool isHead, bool own_
 
 
 void SnakeGame::Snake::setSnakeDirection(Direction direction) {
+    
+
+    switch (this->snakeDirection)
+    {
+    case SnakeGame::UP:
+        if (direction == SnakeGame::DOWN) return;
+        break;
+    
+    case SnakeGame::DOWN:
+        if (direction == SnakeGame::UP) return;
+        break;
+
+    case SnakeGame::LEFT:
+        if (direction == SnakeGame::RIGHT) return;
+        break;
+
+    case SnakeGame::RIGHT:
+        if (direction == SnakeGame::LEFT) return;
+        break;
+    }
+    
     this->snakeDirection = direction;
 }
 
@@ -140,6 +161,34 @@ SnakeGame::SnakeState SnakeGame::Snake::checkCollision(SnakeGame::Food* food) {
     } while (t_snake->nxtSnake != NULL);
 
     return SnakeGame::ALIVE;
+}
+
+SnakeGame::SnakeState SnakeGame::Snake::checkCollision() {
+    if (this->isHead && this->x == thisFood->x && this->y == thisFood->y) {
+        this->addSnake();
+        std::srand(std::time(nullptr));
+        int x, y;
+        do {  
+            x = std::rand() % this->maxW;
+            y = std::rand() % this->maxH;
+        } while (isCollidingBody(x, y));
+        thisFood->setPosition(x, y);
+    }
+    SnakeGame::Snake* t_snake = this;
+    do {
+        t_snake = t_snake->nxtSnake;
+        if (this->isHead&& this->x == t_snake->x && this->y== t_snake->y) {
+            this->state = DEAD;
+            return SnakeGame::DEAD;
+        }
+        
+    } while (t_snake->nxtSnake != NULL);
+
+    return SnakeGame::ALIVE; 
+}
+
+SnakeGame::Food * SnakeGame::Snake::getFoodPtr() {
+    return thisFood;
 }
 
 bool SnakeGame::Snake::isCollidingBody(int x, int y) {

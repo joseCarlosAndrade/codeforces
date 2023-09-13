@@ -1,3 +1,6 @@
+#ifndef NEURAL_NETWORK_H
+#define NEURAL_NETWORK_H
+
 #include<eigen3/Eigen/Dense>
 #include<iostream>
 #include<vector>
@@ -90,19 +93,10 @@ class NetworkContainer {
 
                 iterator++;
             }
-        }    void printAllNetworks () {
-            std::vector<SingleNetwork>::iterator iterator;
-            iterator = networks.begin();
-            
-            while(iterator != networks.end()) {
-                std::cout << "Printing information on network: " << iterator - networks.begin() << std::endl
-                << "Weights: " << std::endl << iterator->getData(WEIGHTS) << std::endl <<std::endl
-                << "Bias: " << std::endl << iterator->getData(BIAS) << std::endl <<std::endl;
-
-                iterator++;
-            } 
-        }
+        }    
         
 };
 
 }
+
+#endif
