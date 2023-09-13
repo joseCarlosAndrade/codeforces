@@ -22,6 +22,27 @@ Eigen::MatrixXf NeuralNetwork::SingleNetwork::calculateOutput(Eigen::MatrixXf in
     return output;
 }
 
+std::vector<float> NeuralNetwork::SingleNetwork::calculateOutput(std::vector<float> input) {
+    assert(input.size() == _n_input);
+
+    Eigen::MatrixXf input_e(input.size(), 1);
+    
+    for(int i = 0; i < _n_input ;i++) {
+        input_e(i, 0) = input[i];
+    }
+
+    Eigen::MatrixXf output = calculateOutput(input_e);
+
+    std::vector<float> output_e;
+    output_e.reserve(output.size());
+
+    for(int i =0; i < output.size(); i++) {
+        output_e.push_back(output(i, 0));
+    } 
+
+    return output_e;
+}
+
 // fill neural network from file
 void NeuralNetwork::SingleNetwork::fillMatrices(std::string w_file_name, std::string b_file_name) {
     // assert(w_file_name!= NULL && b_file_name && NULL);

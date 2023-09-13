@@ -37,6 +37,7 @@ class SingleNetwork {
     }
 
     Eigen::MatrixXf calculateOutput(Eigen::MatrixXf input);
+    std::vector<float> calculateOutput(std::vector<float> input);
     void fillMatrices(std::string w_file_name, std::string b_file_name);
     // void fill_matrices(float*w_array, float*b_array);
     void flushCurrentData();
@@ -80,6 +81,12 @@ class NetworkContainer {
         }
         ~NetworkContainer() {
            
+        }
+
+        SingleNetwork * getNeuralNetwork(int index) {
+            assert(index >= 0 && index <n_networks);
+
+            return &networks[index];
         }
         
         void printAllNetworks () {

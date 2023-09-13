@@ -9,7 +9,7 @@ Game::Game(NeuralNetwork::CONTAINER_SIZE n_s, SnakeGame::SNAKE_VIEW_AREA view, i
     : n_snakes(n_s), height(g_height), width(g_width), w_squares(gw_squares), h_squares(gh_squares), snake_view(view)
     {
         // initializing container of neural networks
-        snakeContainer = new NeuralNetwork::NetworkContainer(n_s, 10, 4);
+        snakeContainer = new NeuralNetwork::NetworkContainer(n_s, 27, 4);
         assert(snakeContainer != NULL);
 
         // intializing game attributes
@@ -114,7 +114,7 @@ void Game::mainLoop() {
 
     while(running) {
         if (this->deadSnakes == n_snakes) { 
-            std::cout << this->deadSnakes << " dead";
+            std::cout << this->deadSnakes << " snakes dead. Game over" << std::endl;
             break;
         }
         snakeTimer++;
@@ -140,6 +140,15 @@ void Game::mainLoop() {
                 // if ( i%snake_view == snake_view-1) std::cout
             }
             std::cout << std::endl << std::endl;
+
+            std::cout << "snake 1 output from neural network: " << std::endl;
+            auto output = snakeContainer->getNeuralNetwork(0)->calculateOutput(in);
+
+            for (int i = 0; i < 4; i++) {
+                std::cout << output[i] << " ";
+            }
+            std::cout << std::endl;
+
             lastSnakeTimer = snakeTimer;
         }
         this->draw();
