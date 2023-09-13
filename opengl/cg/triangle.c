@@ -102,11 +102,11 @@ int main( int argc, char ** argv)
 
 	// CREATING THE VERTICES 
 	// simple triangle:
-	// coordinates vertices[3] = {
-	// 	{-0.5f, 0.0f},
-	// 	{0.0f, 0.5f},
-	// 	{0.5f, 0.0f}
-	// };
+	coordinates vertices[3] = {
+		{-0.5f, 0.0f},
+		{0.0f, 0.5f},
+		{0.5f, 0.0f}
+	};
 
 	// square
 	// coordinates vertices[4] = {
@@ -117,19 +117,19 @@ int main( int argc, char ** argv)
 	// };
 
 	// circle
-	coordinates vertices[CIRCLE_VERTICES];
-	float radius = 0.5f;
-	float pi = 3.141592f;
-	float di = 2*pi / CIRCLE_VERTICES;
+	// coordinates vertices[CIRCLE_VERTICES];
+	// float radius = 0.5f;
+	// float pi = 3.141592f;
+	// float di = 2*pi / CIRCLE_VERTICES;
 	
-	for (int i = 0; i < CIRCLE_VERTICES; i++ ) {
+	// for (int i = 0; i < CIRCLE_VERTICES; i++ ) {
 
-		vertices[i].x = radius * cos(i * di);
-		vertices[i].y = radius * sin(i * di);
+	// 	vertices[i].x = radius * cos(i * di);
+	// 	vertices[i].y = radius * sin(i * di);
 
-		vertices[i+1].x = radius * cos((i+1) * di);
-		vertices[i+1].y = radius * sin((i+1) * di);
-	}
+	// 	vertices[i+1].x = radius * cos((i+1) * di);
+	// 	vertices[i+1].y = radius * sin((i+1) * di);
+	// }
 
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
@@ -143,7 +143,7 @@ int main( int argc, char ** argv)
 
 	glfwShowWindow(window);
 
-	glfwSetKeyCallback(window, callback_key);
+	// glfwSetKeyCallback(window, callback_key);
 
 	while(!glfwWindowShouldClose(window))
 	{
@@ -152,9 +152,9 @@ int main( int argc, char ** argv)
 		glClearColor(1.0, 1.0, 1.0, 1.0);
 		// glColor3f(0.5f, 1.0f, 0.f);
 
-		// glDrawArrays(GL_TRIANGLES, 0, 32);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 		// glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-		glDrawArrays(GL_TRIANGLE_FAN, 0, CIRCLE_VERTICES);
+		// glDrawArrays(GL_TRIANGLE_FAN, 0, CIRCLE_VERTICES);
 		
 
 		glfwSwapBuffers(window);
