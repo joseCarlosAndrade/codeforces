@@ -13,7 +13,7 @@
 #include<math.h>
 
 #define T_JUMP 0.001
-
+#define PI 3.1415
 // defining coodinates data types
 
 typedef struct {
@@ -32,6 +32,7 @@ typedef struct {
 
 transform_matrix transform_t;
 transform_matrix transform_r;
+transform_matrix transform_s;
 
 int holding = 0;
 int current_key = 0;
@@ -59,9 +60,10 @@ int main( int argc, char ** argv)
 	"attribute vec2 position;\n"
 	"uniform mat4 transle_transformation;\n"
 	"uniform mat4 rotate_transformation;\n"
+	"uniform mat4 scale_transformation;\n"
 	"void main()\n"
 	"{\n"
-	"	gl_Position = transle_transformation*rotate_transformation*vec4(position, 0.0, 1.0);\n"
+	"	gl_Position = transle_transformation*rotate_transformation*scale_transformation*vec4(position, 0.0, 1.0);\n"
 	"}\n";
 
 	const GLchar* fragment_code =
@@ -78,7 +80,6 @@ int main( int argc, char ** argv)
 	// associating shader sources with glsl code
 	glShaderSource(vertex, 1, &vertex_code, NULL);
 	glShaderSource(fragment, 1, &fragment_code, NULL);
-
 	glCompileShader(vertex); // compiling
 
 	// error handling
@@ -129,7 +130,7 @@ int main( int argc, char ** argv)
 		{ 0.0f, 0.2f}
 	};
 
-	
+	// SENDING AIRSHIP DATA TO GPU
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -140,6 +141,7 @@ int main( int argc, char ** argv)
     glEnableVertexAttribArray(loc);
     glVertexAttribPointer(loc, 2, GL_FLOAT, GL_FALSE, sizeof(airship[0]), (void*) 0);
 
+	// window showing
 	glfwShowWindow(window);
 
 	// defining callback key function
@@ -168,7 +170,17 @@ int main( int argc, char ** argv)
 	transform_r.angle = 0;
 	transform_r.angle_inc = 0;
 
-	while(!glfwWindowShouldClose(window))
+	// scale matrix
+	transform_s.matrix = (float*) calloc(16, sizeof(float));
+	for(int i = 0; i < 4; i++) {
+		transform_s.matrix[i*4 +i] = 1;
+	}
+	transform_s.tx = &(transform_s.matrix[0]);
+	transform_s.ty = &(transform_s.matrix[5]);
+	transform_s.tx_inc = 0;
+	transform_s.ty_inc = 0;
+
+	while(!glfwWindowShouldClose(window) && glfwGetKey(window, GLFW_KEY_ESCAPE)!= GLFW_PRESS)
 	{
 		glfwPollEvents();
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -182,21 +194,22 @@ int main( int argc, char ** argv)
 		}
 
 		// TRANSFORM MATRIX
-		*(transform_t.tx) += transform_t.tx_inc;
-		*(transform_t.ty) += transform_t.ty_inc;
+		// *(transform_t.tx) += transform_t.tx_inc;
+		// *(transform_t.ty) += transform_t.ty_inc;
+		float ang_t = transform_r.angle + PI/2;
+		*(transform_t.tx) += transform_t.tx_inc * sin(ang_t)+ transform_t.ty_inc * cos(ang_t);
+		*(transform_t.ty) += transform_t.ty_inc * sin(ang_t)+ transform_t.tx_inc * cos(ang_t);
+
+		printf("tx: %lf; ty: %lf; ang: %lf; scale: %lf\n", *(transform_t.tx), *(transform_t.ty), transform_r.angle, *(transform_s.tx));
 
 		// if (*(transform_t.tx) >= 1) 
 		*(transform_t.tx) *= 1-2*( abs( *(transform_t.tx)) > 1);
 		*(transform_t.ty) *= 1-2*( abs( *(transform_t.ty)) > 1);
+
+		// minha logica para desacelerar a nave quando holding == 0
+		transform_t.tx_inc += -(0.01 * !holding*10)*transform_t.tx_inc;
+		transform_t.ty_inc += -(0.01 * !holding*10)*transform_t.ty_inc;
 		
-		// if (transform_t.tx_inc > 0) transform_t.tx_inc -= 1*transform_t.tx_inc;
-		// if (transform_t.tx_inc < 0) transform_t.tx_inc += 1*transform_t.tx_inc;
-		// if (transform_t.ty_inc > 0) transform_t.ty_inc -= 1*transform_t.ty_inc;
-		// if (transform_t.ty_inc < 0) transform_t.ty_inc += 1*transform_t.ty_inc;
-		if (1) {
-			transform_t.tx_inc += -(0.01 * !holding*10)*transform_t.tx_inc;
-			transform_t.ty_inc += -(0.01 * !holding*10)*transform_t.ty_inc;
-		} 
 		
 		loc = glGetUniformLocation(program, "transle_transformation");
 		glUniformMatrix4fv(loc, 1, GL_TRUE, transform_t.matrix);
@@ -209,6 +222,10 @@ int main( int argc, char ** argv)
 		transform_r.matrix[5] = cos(ang);
 		loc = glGetUniformLocation(program, "rotate_transformation");
 		glUniformMatrix4fv(loc, 1, GL_TRUE, transform_r.matrix);
+
+		// scale matrix
+		loc = glGetUniformLocation(program, "scale_transformation");
+		glUniformMatrix4fv(loc, 1, GL_TRUE, transform_s.matrix);
 
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		
@@ -226,13 +243,22 @@ int main( int argc, char ** argv)
 
 static void callback_key(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	printf("Key pressed: %d; Scancode pressed: %d; action: %d; mods: %d\n", key, scancode, action, mods);
+	// printf("Key pressed: %d; Scancode pressed: %d; action: %d; mods: %d\n", key, scancode, action, mods);
 	current_key = key;
 
 	if (action == GLFW_PRESS || action == GLFW_REPEAT)
 		{
-			if (key == GLFW_KEY_D) transform_r.angle += 0.07;
-			if (key == GLFW_KEY_A) transform_r.angle -= 0.07;
+			if (key == GLFW_KEY_D) transform_r.angle -= 0.07;
+			if (key == GLFW_KEY_A) transform_r.angle += 0.07;
+			if (key == GLFW_KEY_W) {
+				*(transform_s.tx) += 0.07;
+				*(transform_s.ty) += 0.07;
+			}
+			if (key == GLFW_KEY_S) {
+				*(transform_s.tx) -= 0.07;
+				*(transform_s.ty) -= 0.07;
+			}
+			
 			holding = 1;
 		}
 	else holding = 0;

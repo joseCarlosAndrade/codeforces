@@ -5,8 +5,8 @@
 #include"../include/SDLSnakeGameAi.hpp"
 #include<map>
 
-Game::Game(NeuralNetwork::CONTAINER_SIZE n_s, SnakeGame::SNAKE_VIEW_AREA view, int g_height , int g_width , int gw_squares, int gh_squares ) 
-    : n_snakes(n_s), height(g_height), width(g_width), w_squares(gw_squares), h_squares(gh_squares), snake_view(view)
+Game::Game(NeuralNetwork::CONTAINER_SIZE n_s, SnakeGame::SNAKE_VIEW_AREA view, snake_behavior bh, int g_height , int g_width , int gw_squares, int gh_squares ) 
+    : n_snakes(n_s), height(g_height), width(g_width), w_squares(gw_squares), h_squares(gh_squares), snake_view(view), behavior(bh)
     {
         // initializing container of neural networks
         snakeContainer = new NeuralNetwork::NetworkContainer(n_s, 27, 4);
@@ -50,6 +50,7 @@ void Game::initSnakes() {
         food_x = std::rand() % w_squares;
         food_y = std::rand() % h_squares;
         SnakeGame::Snake c_snake(w_squares/2, h_squares/2, w_squares, h_squares, true, true, food_x, food_y, snake_view);
+        c_snake.setThisBrain(snakeContainer->getNeuralNetwork(i));
         snakes.push_back(c_snake);
     }
 }
@@ -69,39 +70,52 @@ void Game::update() {
 }
 
 // update all snakes on game
-void Game::updateSnakes() {
-    std::map<int , SnakeGame::Direction> map;
+void Game::updateSnakes(snake_behavior mode) {
+    
+        std::map<int , SnakeGame::Direction> map;
         map[0] = SnakeGame::RIGHT;
         map[1] = SnakeGame::DOWN;
         map[2] = SnakeGame::LEFT;
         map[3] = SnakeGame::UP;
 
-    std::vector<SnakeGame::Snake>::iterator snake_iterator = snakes.begin();
-    int i =0;
-    while(snake_iterator != snakes.end()) {
-        if (i++ > n_snakes) break; // for safety
-        
-        if (snake_iterator->state == SnakeGame::DEAD) {
+        int index = 0;
+        SnakeGame::Direction thisDirecion;
+
+        std::vector<SnakeGame::Snake>::iterator snake_iterator = snakes.begin();
+        int i =0;
+        while(snake_iterator != snakes.end()) {
+            if (i++ > n_snakes) break; // for safety
+            
+            if (snake_iterator->state == SnakeGame::DEAD) {
+                snake_iterator++;
+                continue;
+            }
+            
+            if (behavior == RANDOM) {
+                index = std::rand() % 4;
+                thisDirecion = map[index];
+                snake_iterator->setSnakeDirection(thisDirecion);
+            }
+            else {
+                snake_iterator->takeDecision();
+            }
+            
+            // std::cout << i++ << " " << map[i] << std::endl;
+             // all moving down for now
+
+             // **** ia role
+            snake_iterator->moveAllSnakes();
+            snake_iterator->checkCollision();
+            // lastSnakeTimer = snakeTimer;
+            if (snake_iterator->state==SnakeGame::DEAD) {
+                this->deadSnakes++;
+                snake_iterator->changeAllStates();
+            }
+
             snake_iterator++;
-            continue;
-        }
-
-        int index = std::rand() % 4;
-        
-        // std::cout << i++ << " " << map[i] << std::endl;
-        SnakeGame::Direction thisDirecion = map[index]; // all moving down for now
-
-        snake_iterator->setSnakeDirection(thisDirecion); // **** ia role
-        snake_iterator->moveAllSnakes();
-        snake_iterator->checkCollision();
-        // lastSnakeTimer = snakeTimer;
-        if (snake_iterator->state==SnakeGame::DEAD) {
-            this->deadSnakes++;
-            snake_iterator->changeAllStates();
-        }
-
-        snake_iterator++;
-    }   
+        }   
+   
+    
 }
 
 
@@ -123,31 +137,31 @@ void Game::mainLoop() {
 
         this->input();
         // this->update();
-        if (snakeTimer - lastSnakeTimer >= fps/6 && snakeTimer > FPS + 5) {
-            this->updateSnakes();
-            std::vector<float> in = snakes[0].getInputs();
-            int k =0 ;
-            std::cout << "what the first snake is seeing:" << std::endl <<  "distance from food x and y: ";
-            for ( int i = 0; i < snake_view*snake_view + 2; i++) {
+        if (snakeTimer - lastSnakeTimer >= fps/6 && snakeTimer > FPS + 10) {
+            this->updateSnakes(behavior);
+            // std::vector<float> in = snakes[0].getInputs();
+            // int k =0 ;
+            // std::cout << "what the first snake is seeing:" << std::endl <<  "distance from food x and y: ";
+            // for ( int i = 0; i < snake_view*snake_view + 2; i++) {
                 
-                if ( i >1) {
-                    if(i ==2) std::cout << std::endl;
+            //     if ( i >1) {
+            //         if(i ==2) std::cout << std::endl;
 
-                    if (k >=5) { std::cout << std::endl; k=0;}
-                    k++;
-                }
-                std::cout << in[i] << " ";
-                // if ( i%snake_view == snake_view-1) std::cout
-            }
-            std::cout << std::endl << std::endl;
+            //         if (k >=5) { std::cout << std::endl; k=0;}
+            //         k++;
+            //     }
+            //     std::cout << in[i] << " ";
+            //     // if ( i%snake_view == snake_view-1) std::cout
+            // }
+            // std::cout << std::endl << std::endl;
 
-            std::cout << "snake 1 output from neural network: " << std::endl;
-            auto output = snakeContainer->getNeuralNetwork(0)->calculateOutput(in);
+            // std::cout << "snake 1 output from neural network: " << std::endl;
+            // auto output = snakeContainer->getNeuralNetwork(0)->calculateOutput(in);
 
-            for (int i = 0; i < 4; i++) {
-                std::cout << output[i] << " ";
-            }
-            std::cout << std::endl;
+            // for (int i = 0; i < 4; i++) {
+            //     std::cout << output[i] << " ";
+            // }
+            // std::cout << std::endl;
 
             lastSnakeTimer = snakeTimer;
         }

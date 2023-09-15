@@ -41,6 +41,11 @@ SnakeGame::Snake::Snake(int x, int y, int maxW, int maxH, bool isHead, bool own_
 
     
     if (own_food) this->thisFood = new SnakeGame::Food(fx, fy);
+
+    this->directionMap[0] = SnakeGame::RIGHT;
+    this->directionMap[1] = SnakeGame::DOWN;
+    this->directionMap[2] = SnakeGame::LEFT;
+    this->directionMap[3] = SnakeGame::UP;
 }
 
 // changes snake direction if not forbidden
@@ -255,6 +260,28 @@ std::vector<float> SnakeGame::Snake::getInputs() {
     }
 
     return inputs;
+}
+
+void SnakeGame::Snake::setThisBrain(NeuralNetwork::SingleNetwork* single) {
+    snakeBrain = single;
+}
+
+void SnakeGame::Snake::takeDecision() {
+    // changes dierction based on output from neural network
+    auto output = snakeBrain->calculateOutput(this->getInputs());
+    int greater = 0;
+    float greaterNum = 0;
+    for (int i = 0; i<4; i++) {
+        if (output[i] > greaterNum) {
+            greaterNum = output[i];
+            greater = i;
+        }
+    }
+    std::cout << "outputs:  ";
+    for (auto i : output) std::cout << i<< " ";
+    std::cout  << std::endl;
+    std::cout << "decision took: "<< directionMap[greater] << std::endl << std::endl;
+    this->setSnakeDirection(directionMap[greater]);
 }
 
 
