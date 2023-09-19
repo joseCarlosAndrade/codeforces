@@ -3,10 +3,10 @@
 int main(void) {
     stack_maze * stack =create_stack();
 
-    push(stack, create_item(0, 0));
-    push(stack, create_item(3, 9));
-    push(stack, create_item(3, 9));
-    push(stack, create_item(3, 10));
+    push(stack, create_item(0, 0,  UP));
+    push(stack, create_item(3, 9, DOWN));
+    push(stack, create_item(3, 9, LEFT));
+    push(stack, create_item(3, 10, RIGHT));
     
     maze_t * item;
     pop(stack, &item);
