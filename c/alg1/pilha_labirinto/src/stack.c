@@ -1,7 +1,7 @@
 #include"../include/item.h"
 #include"../include/stack.h"
 
-#define STACK_SIZE 100
+#define STACK_SIZE 1000
 
 struct _stack_maze {
     int top;
@@ -41,7 +41,7 @@ int push(stack_maze* stack, maze_t* pos) {
 }
 
 int pop(stack_maze* stack, maze_t** pos) {
-    assert(stack != NULL);
+    assert(stack != NULL && !is_empty(stack));
     if (is_empty(stack)) return 0;
 
     *pos = stack->stack[stack->top--];

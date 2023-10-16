@@ -22,4 +22,20 @@ int main(void) {
         int y = get_y_value(it);
         printf("pop: %d %d\n", x, y);
     }
+
+    maze_t*it;
+    pop(stack, &it);
+    x = get_x_value(it);
+    y = get_y_value(it);
+    printf("pop: %d %d\n", x, y);
+
+        pop(stack, &it);
+    x = get_x_value(it);
+    y = get_y_value(it);
+    printf("pop: %d %d\n", x, y);
+
+        pop(stack, &it);
+    x = get_x_value(it);
+    y = get_y_value(it);
+    printf("pop: %d %d\n", x, y);
 }

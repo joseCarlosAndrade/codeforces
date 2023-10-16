@@ -39,10 +39,12 @@ void print_maze(int r, int c, int maze[r][c]) {
 
 // ordem: baixo, esquerda, cima, direita
 int make_movement(int i, maze_direction last_direction, int ic, int jc, int r, int c, int maze[r][c],stack_maze * maze_stack) {
+   
     printf("(%d, %d)\n", ic, jc);
-    if (i++>10) return 1;
     int ni, nj;
     if(maze[ic][jc] == 2) return 1;
+    maze[ic][jc] = 0; // marcar celula como ja visitada	
+
 
     // baixo
     if ( ic+1 < r && last_direction != UP) {
@@ -71,12 +73,22 @@ int make_movement(int i, maze_direction last_direction, int ic, int jc, int r, i
             push(maze_stack, create_item(ic, jc+1, RIGHT));
         }
     }
+    
+    if((i >= r*c -1 ) || (is_empty(maze_stack) && i > 0)) {
+        printf("Saída não encontrada.\n"); return 0;
+        }
+    i++;
 
     maze_t * coord;
     pop(maze_stack, &coord);
     ni = get_x_value(coord);
     nj = get_y_value(coord);
+    if (ni == ic && nj == jc) {
+        printf("Saída não encontrada.\n"); return 0;
+    }
     maze_direction new_direction = get_direction_value(coord);
+
+    
     
     return make_movement(i, new_direction, ni, nj, r, c, maze,maze_stack);
 }
