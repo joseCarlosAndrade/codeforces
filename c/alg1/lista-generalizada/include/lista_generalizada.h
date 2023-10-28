@@ -6,7 +6,7 @@
 #include<assert.h>
 
 // definindo tipo de elemento
-typedef char elem;
+typedef elem;
 
 typedef struct bloco no_t;
 

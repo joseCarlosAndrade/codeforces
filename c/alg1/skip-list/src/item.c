@@ -1,4 +1,4 @@
-#include<../include/item.h>
+#include"../include/item.h"
 
 
 struct _item {
@@ -8,23 +8,23 @@ struct _item {
 item_t * item_criar(elem v) {
 	item_t * t = NULL;
 	t= (item_t*)calloc(1, sizeof(item_t));
-	assert(t!=NULL);
-
+	if(!t) exit(EXIT_FAILURE);
+	t->valor = v;
 	return t;
 }
 
 void item_set_valor(item_t * item, elem valor) {
-	assert(item_t != NULL);
+	if(!item ) exit(EXIT_FAILURE);
 
 	item->valor = valor;
 } 
 
-elem item_set_valor(item_t * item) {
-	assert(item!=NULL);
+elem item_get_valor(item_t * item) {
+	if(!item ) exit(EXIT_FAILURE);
 	return item->valor;
 }
 void item_apagar(item_t * item) {
-	assert(item !=NULL);
+	if(!item ) exit(EXIT_FAILURE);
 
 	free(item);
 	item = NULL;
