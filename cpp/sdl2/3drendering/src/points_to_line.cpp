@@ -8,11 +8,8 @@ int main() {
         screen.pixel(rand()%WIDTH-WIDTH/2, rand()%HEIGHT-HEIGHT/2, rand()%150 -75 , 3);
     }
 
-
-
-
     // drawing a cube on buffer 3
-    screen.cube(WIDTH/2, 3);
+    // screen.cube(WIDTH/2, 3);
     screen.rotate_points_y(0.2, 3);
     screen.rotate_points_x(0.4, 3);
 
@@ -26,6 +23,16 @@ int main() {
     // change the system::
 
     // dont change the points in translation, but always leave them as  0.0.0
+
+    // new tests:
+    // Geometry::Line line(0, 0, 0, 100, 100, 0);
+    Object line = Geometry::Line(0, 0, 0, 100, 100, 0);
+    screen.addObjectToScene(&line, 8); // adding the line object to the scene on object buffer map 0
+    // screen.rotate_points_x(line, 0.01);
+
+    Object line2 = Geometry::Line(-100, -100, 0, -100, 100, 0);
+    screen.addObjectToScene(&line2, 0);
+
 
     while(1) {
         screen.input();
@@ -46,12 +53,19 @@ int main() {
 
 
         // rotating torus
+        /*a*/
         screen.rotate_points_x(0.03, 0);
         screen.rotate_points_y(0.05, 0);
         screen.rotate_points_z(0.02, 0);
 
 
-        
+        // rotating objects
+        screen.rotate_points_x(0.01, line);
+        // screen.rotate_points_y(line, 0.06);
+        // screen.rotate_points_z(line, 0.06);
+        // screen.rotate_points_y(0.05, 8);
+        // screen.rotate_points_x(0.1);
+
         screen.show();
         screen.sleep_rate(30);
 

@@ -6,17 +6,14 @@
 #include<map>
 #include<numeric>
 
-#include"Matrices.hpp"
+#include"Matrices.hpp" // matrices handling
+
+#include"Geometry.hpp" // geometric objects
 
 #define WIDTH 640
 #define HEIGHT 480
 #define RESOLUTION_SCALE 1
 
-typedef struct _3dPoint {
-    float x;
-    float y;
-    float z;
-} F3DPoint;
 
 class Screen {
     private:
@@ -25,14 +22,20 @@ class Screen {
         SDL_Renderer * renderer;
         // std::vector<F3DPoint> points; // vector thar stores everypoint to be drawn
 
+        /* Raw 3d points buffer map */
         std::map<int, std::vector<F3DPoint>> point_map;
+
+        /* Object buffer map */
+        std::map<int, std::vector<Object*>> object_map;
 
         int rate;
 
         std::string window_title;
 
         int current_buffer;
+        int current_obj_buffer;
 
+        /* Pre initalized matrix to speed up geometric transformations */
         MatrixRotationX _rotation_matrix_x;
         MatrixRotationY _rotation_matrix_y;
         MatrixRotationZ _rotation_matrix_z;
@@ -105,6 +108,7 @@ class Screen {
             SDL_RenderClear(renderer);
             // SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // white, drawing pixels
             
+            // draws for each raw buffer
             for ( auto& cpoints : point_map) {
 
                 for (auto &point : cpoints.second) {
@@ -122,6 +126,25 @@ class Screen {
                 
 
             }
+
+            // draws for each obj buffer
+            for (auto & obj_buffer : object_map) {
+                for ( auto objects : obj_buffer.second) { // objects is pointer to Object
+                    for ( auto point : objects->getPoints()) {
+                        if(point.x < -WIDTH/2 || point.x > WIDTH/2 || point.y < -HEIGHT/2 || point.y > HEIGHT/2) continue; 
+                   
+                        int depth = (uint)255-(point.z);
+                        if (depth < 0) depth = 0;
+
+                        else if(depth >255) depth = 255;
+
+                        SDL_SetRenderDrawColor(renderer, depth, depth, depth, 255);
+                        // std::cout<< (uint)255-point.z << " " ;
+                        SDL_RenderDrawPointF(renderer, point.x+WIDTH/2, -point.y+HEIGHT/2);
+                    }
+                }
+            }
+
             SDL_RenderPresent(renderer); // actually draws
         }
 
@@ -142,62 +165,39 @@ class Screen {
             
         }
 
-        /* Get the line properties from 2 points (start and end)*/
-        void line(float x1, float y1, float z1, float x2, float y2, float z2) {
-            float dx = x2 - x1;
-            float dy = y2 - y1;
-            float dz = z2 - z1;
-
-            float length = std::sqrt(dx*dx + dy*dy + dz*dz);
-
-            // float angle = std::atan2(dy, dx); // getting the line angle
-            // float angle2 = std::atan2(dy, dz); // getting the line angle
-
-            // (z1+ ((z2-z1)/length) *i )
-            // for ( float i = 0; i < length; i++) {
-            //     pixel( x1 + std::cos(angle)*i , y1 + std::sin(angle)*i, z1+std::cos(angle2)*i);
-            // }   
-            // float dt = length;
-            float vector[3] = {(x2-x1)/length, (y2-y1)/length, (z2-z1)/length };
-            // while (dt > 0.01) {
-                // 
-            // }
-
-            for (float i = 0; i < length ; i++) {
-                pixel(x1 + vector[0]*i, y1 + vector[1]*i, z1 + vector[2]*i, current_buffer);
-            }
-
-        }
 
         void rotate_points_x(float angle, int buffer =-1) {
             
             _rotation_matrix_x.rot(angle);
 
             if (buffer < 0) {
-                for ( auto & points : point_map) {
+                for ( auto & buffer : object_map) {
 
-                    for (auto &point : points.second ) {
-                        GenMatrix4x4f pt(point.x, point.y, point.z);
-                        pt = _rotation_matrix_x * pt;
-                        point.x = pt(0, 0);
-                        point.y = pt(1, 0);
-                        point.z = pt(2, 0);
-
-                    }    
+                    for (auto obj : buffer.second) {
+                        rotate_points_x(angle, *obj);
+                    } 
                 }
             }
 
             else {
-                for (auto &point : point_map[buffer] ) {
-                    GenMatrix4x4f pt(point.x, point.y, point.z);
-                    pt = _rotation_matrix_x * pt;
-                    point.x = pt(0, 0);
-                    point.y = pt(1, 0);
-                    point.z = pt(2, 0);
-
-                }    
+                for (auto obj : object_map[buffer]) {
+                        rotate_points_x(angle, *obj);
+                    }     
             }
+        }
+
+        void rotate_points_x(float angle, Object &obj) {
             
+            _rotation_matrix_x.rot(angle);
+
+            for (auto &point : obj.getPoints() ) {
+                GenMatrix4x4f pt(point.x, point.y, point.z);
+                pt = _rotation_matrix_x * pt;
+                point.x = pt(0, 0);
+                point.y = pt(1, 0);
+                point.z = pt(2, 0);
+
+            }    
         }
 
         void rotate_points_y(float angle, int buffer=-1) {
@@ -205,29 +205,35 @@ class Screen {
             _rotation_matrix_y.rot(angle);
 
             if (buffer < 0) {
-                for ( auto & points : point_map) {
+                for ( auto & buffer : object_map) {
 
-                    for (auto &point : points.second ) {
-                        GenMatrix4x4f pt(point.x, point.y, point.z);
-                        pt = _rotation_matrix_y * pt;
-                        point.x = pt(0, 0);
-                        point.y = pt(1, 0);
-                        point.z = pt(2, 0);
+                    for (auto obj : buffer.second) {
+                        rotate_points_y(angle, *obj);
 
-                    }    
+                    } 
                 }
             }
 
             else {
-                for (auto &point : point_map[buffer] ) {
-                    GenMatrix4x4f pt(point.x, point.y, point.z);
-                    pt = _rotation_matrix_y * pt;
-                    point.x = pt(0, 0);
-                    point.y = pt(1, 0);
-                    point.z = pt(2, 0);
-
-                }    
+                for (auto obj : object_map[buffer]) {
+                        rotate_points_y(angle, *obj);  
+                    }     
             }
+        }
+
+        void rotate_points_y(float angle, Object &obj) {
+            
+            _rotation_matrix_y.rot(angle);
+
+            for (auto &point : obj.getPoints() ) {
+                GenMatrix4x4f pt(point.x, point.y, point.z);
+                pt = _rotation_matrix_y * pt;
+                point.x = pt(0, 0);
+                point.y = pt(1, 0);
+                point.z = pt(2, 0);
+
+            }    
+
         }
 
         void rotate_points_z(float angle, int buffer=-1) {
@@ -235,29 +241,34 @@ class Screen {
             _rotation_matrix_z.rot(angle);
 
             if (buffer < 0) {
-                for ( auto & points : point_map) {
+                for ( auto & buffer : object_map) {
 
-                    for (auto &point : points.second ) {
-                        GenMatrix4x4f pt(point.x, point.y, point.z);
-                        pt = _rotation_matrix_z * pt;
-                        point.x = pt(0, 0);
-                        point.y = pt(1, 0);
-                        point.z = pt(2, 0);
-
-                    }    
+                    for (auto obj : buffer.second) {
+                        rotate_points_z(angle, *obj);
+                    } 
                 }
             }
 
             else {
-                for (auto &point : point_map[buffer] ) {
-                    GenMatrix4x4f pt(point.x, point.y, point.z);
-                    pt = _rotation_matrix_z * pt;
-                    point.x = pt(0, 0);
-                    point.y = pt(1, 0);
-                    point.z = pt(2, 0);
-
-                }    
+                for (auto obj : object_map[buffer]) {
+                        rotate_points_z(angle, *obj); 
+                    }     
             }
+        }
+
+        void rotate_points_z(float angle, Object &obj) {
+            
+            _rotation_matrix_z.rot(angle);
+
+            for (auto &point : obj.getPoints() ) {
+                GenMatrix4x4f pt(point.x, point.y, point.z);
+                pt = _rotation_matrix_z * pt;
+                point.x = pt(0, 0);
+                point.y = pt(1, 0);
+                point.z = pt(2, 0);
+
+            }    
+
         }
 
         void translate_points(float tx, float ty, float tz, int buffer= -1) {
@@ -297,42 +308,31 @@ class Screen {
             }
         }
 
+        void translate_points(Object & obj, float tx, float ty, float tz) {
+
+            _translation_matrix.x(tx);
+            _translation_matrix.y(ty);
+            _translation_matrix.z(tz);
+                 
+            for (auto &point : obj.getPoints()) {
+                GenMatrix4x4f pt(point.x, point.y, point.z);
+
+                pt = _translation_matrix * pt;
+                point.x = pt(0, 0);
+                point.y = pt(1, 0);
+                point.z = pt(2, 0);
+
+            }        
+                  
+            
+        }
+
         void sleep_rate(int r = -1) {
             if (r > 0) SDL_Delay(1000/r);
 
             else SDL_Delay(1000);
         }
 
-        void cube(int arest_size, int buffer = 0) {
-            // creating a cube
-            int vertice = arest_size/2;
-
-            current_buffer = buffer;
-
-            // front face
-            line(-vertice, -vertice, -vertice, vertice, -vertice, -vertice);
-            line(vertice, -vertice, -vertice, vertice, vertice, -vertice);
-            line(vertice, vertice, -vertice, -vertice, vertice, -vertice);
-            line(-vertice, vertice, -vertice, -vertice, -vertice, -vertice);
-
-            // back face
-            // screen.line(-vertice, -vertice, vertice, vertice, -vertice, -vertice);
-            // screen.line(vertice, -vertice, vertice, vertice, vertice, -vertice);
-            // screen.line(vertice, vertice, vertice, -vertice, vertice, -vertice);
-            // screen.line(-vertice, vertice, vertice, -vertice, -vertice, -vertice);
-            
-            line(vertice, vertice, vertice, vertice, vertice, -vertice);
-            line(-vertice, vertice, vertice, -vertice, vertice, -vertice);
-            line(-vertice, -vertice, vertice, -vertice, -vertice, -vertice);
-            line(vertice, -vertice, vertice, vertice, -vertice, -vertice);
-
-            line(-vertice, -vertice, vertice, vertice, -vertice, vertice);
-            line(vertice, -vertice, vertice, vertice, vertice, vertice);
-            line(vertice, vertice, vertice, -vertice, vertice, vertice);
-            line(-vertice, vertice, vertice, -vertice, -vertice, vertice);
-
-            current_buffer = 0;
-        }
 
         void circle( int xo , int yo , int radius, int buffer) {
             
@@ -341,6 +341,7 @@ class Screen {
                 pixel(xo + radius*std::cos(i), yo + radius*std::sin(i), 0, buffer);
             }
         }
+
 
         void torus (int buffer =0) {
             int t_radius = 100;
@@ -366,6 +367,71 @@ class Screen {
             
 
         }
+
+
+        /* Adds the object to the scene by referece and stores it on the specified buffer.
+        If no value is passed to the buffer, it will be stored on location 0 by default. 
+        This means that every modification on the object outside will still take place inside the scene. */
+        bool addObjectToScene(Object* obj, int buffer= 0) {
+            if (obj == nullptr) return false;
+
+            object_map[buffer].emplace_back(obj);
+            return true;
+        }
 };
 
 #endif
+
+
+
+
+/*
+OLD
+void rotate_points_z(float angle, int buffer=-1) {
+
+            _rotation_matrix_z.rot(angle);
+
+            if (buffer < 0) {
+                for ( auto & points : point_map) {
+
+                    for (auto &point : points.second ) {
+                        GenMatrix4x4f pt(point.x, point.y, point.z);
+                        pt = _rotation_matrix_z * pt;
+                        point.x = pt(0, 0);
+                        point.y = pt(1, 0);
+                        point.z = pt(2, 0);
+
+                    }    
+                }
+            }
+
+            else {
+                for (auto &point : point_map[buffer] ) {
+                    GenMatrix4x4f pt(point.x, point.y, point.z);
+                    pt = _rotation_matrix_z * pt;
+                    point.x = pt(0, 0);
+                    point.y = pt(1, 0);
+                    point.z = pt(2, 0);
+
+                }    
+            }
+        }
+
+
+               //Get the line properties from 2 points (start and end)
+        void line(float x1, float y1, float z1, float x2, float y2, float z2) {
+            float dx = x2 - x1;
+            float dy = y2 - y1;
+            float dz = z2 - z1;
+
+            float length = std::sqrt(dx*dx + dy*dy + dz*dz);
+
+            float vector[3] = {(x2-x1)/length, (y2-y1)/length, (z2-z1)/length };
+
+            for (float i = 0; i < length ; i++) {
+                pixel(x1 + vector[0]*i, y1 + vector[1]*i, z1 + vector[2]*i, current_buffer);
+            }
+
+        }
+
+*/
