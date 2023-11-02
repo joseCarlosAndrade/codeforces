@@ -17,6 +17,7 @@ int main() {
     // torus on buffer 2
     Object torus = Geometry::Torus(150, 50);
     screen.addObjectToScene(&torus, 2);
+    screen.translate_points(0,0,50, torus);
 
     // point cloud on buffer 5
     std::vector<float> pointCloud;
@@ -55,9 +56,12 @@ int main() {
             screen.rotate_points_z(-0.04, cube);
 
         /* TORUS */
-            screen.rotate_points_x(0.05, torus);
-            screen.rotate_points_y(0.05, torus);
-            screen.rotate_points_z(0.05, torus);
+            screen.centralize(torus);
+                screen.rotate_points_x(0.05, torus);
+                screen.rotate_points_y(0.05, torus);
+                screen.rotate_points_z(0.05, torus);
+            screen.back_to_last_position(torus);
+            // screen.translate_points(0, 0, 5, torus);
 
         /* POINT CLOUD */
             screen.rotate_points_x(0.05, pointcloud);

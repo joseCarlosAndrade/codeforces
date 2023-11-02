@@ -61,6 +61,7 @@ namespace Geometry {
         // int c_radius = 50;
 
         for ( float phi = 0 ; phi < 2*3.1415; phi+=3.1415/50) {
+            
             MatrixRotationY rotation_y(phi);
             
             for ( float i = 0; i < 2*3.14159; i+=3.14159/100) {

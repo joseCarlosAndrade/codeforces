@@ -19,6 +19,7 @@ Different projection modes. Currently theres only orthogonal
 Depth Buffer (how will i do this i have no clue)
 Better depth illustration, maybe increase the point thickness?
 Inser Text Type
+Double buffer - while filling one, black the other, and swap them on the iteration end
 */
 
 
@@ -51,14 +52,21 @@ class Screen {
 
         MatrixScale _scale_matrix;
 
+        /* Screen */
+        float gray_scale_screen_black[HEIGHT][WIDTH];
+        float gray_scale_buffer[HEIGHT][WIDTH];
         
 
     public:
         Screen() {
+            float temp_buffer[HEIGHT][WIDTH] = {0};
+            memcpy(gray_scale_screen_black, temp_buffer, HEIGHT*WIDTH*sizeof(float)); // or sizeof gray_scale_screen
+
             SDL_Init(SDL_INIT_VIDEO);
             SDL_CreateWindowAndRenderer(WIDTH*RESOLUTION_SCALE, HEIGHT*RESOLUTION_SCALE, 0, &window, &renderer);
             SDL_RenderSetScale(renderer, RESOLUTION_SCALE, RESOLUTION_SCALE);
             window_title = "desenho!";
+
             SDL_SetWindowTitle(window, window_title.c_str());
 
             // main point list
@@ -148,23 +156,34 @@ class Screen {
             // }
 
             // draws for each obj buffer
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
             for (auto & obj_buffer : object_map) {
                 for ( auto objects : obj_buffer.second) { // objects is pointer to Object
                     for ( auto point : objects->getPoints()) {
-                        if(point.x < -WIDTH/2 || point.x > WIDTH/2 || point.y < -HEIGHT/2 || point.y > HEIGHT/2) continue; 
-                   
-                        int depth = (uint)255-(point.z);
+
+                        // if (point.z >= 130) continue;
+
+                        int depth = (uint)(point.z);
                         if (depth < 0) depth = 0;
 
                         else if(depth >255) depth = 255;
 
                         SDL_SetRenderDrawColor(renderer, depth, depth, depth, 255);
-                        // std::cout<< (uint)255-point.z << " " ;
-                        float xf = point.x+WIDTH/2;
-                        float yf = -point.y+HEIGHT/2;
+
+                        // screen inversion 
+                        float d = 300; // distance from the camera to the screen
+                        float D = 200; // distance from the screen to the world origin
+                        float factor = (1+ (D-point.z)/d);
+                        float xf = point.x/factor;
+                        float yf = point.y/factor;
+
+                        if(xf < -WIDTH/2 || xf > WIDTH/2 || yf < -HEIGHT/2 || yf > HEIGHT/2 || point.z >= D+d) continue; 
+                        
+                        xf = xf+WIDTH/2;
+                        yf = -yf+HEIGHT/2;
                         SDL_RenderDrawPointF(renderer, xf, yf);
 
-                        // didnt really like the result
+                        // (didnt really like the result) attempt of better illustrating depth
                         // float r = (depth*1)/255; // maximum radius is 4 (closest to the screen)
 
                         // if ( depth > 50) { // less than 50 it doesnt enter, for optimization
@@ -178,6 +197,7 @@ class Screen {
             }
 
             SDL_RenderPresent(renderer); // actually draws
+            memcpy(gray_scale_buffer, gray_scale_screen_black, HEIGHT*WIDTH*sizeof(float)); // resets the screen
         }
 
         /* Appends to the point list the pixel coordinates (on the range of WIDTH and HEIGHT).*/
