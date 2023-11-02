@@ -14,6 +14,13 @@
 #define HEIGHT 480
 #define RESOLUTION_SCALE 1
 
+/* TODO:
+Different projection modes. Currently theres only orthogonal
+Depth Buffer (how will i do this i have no clue)
+Better depth illustration, maybe increase the point thickness?
+Inser Text Type
+*/
+
 
 class Screen {
     private:
@@ -111,23 +118,34 @@ class Screen {
             // SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // white, drawing pixels
             
             // draws for each raw buffer
-            for ( auto& cpoints : point_map) {
+            // for ( auto& cpoints : point_map) {
 
-                for (auto &point : cpoints.second) {
-                    if(point.x < -WIDTH/2 || point.x > WIDTH/2 || point.y < -HEIGHT/2 || point.y > HEIGHT/2) continue; 
+            //     for (auto &point : cpoints.second) {
+            //         if(point.x < -WIDTH/2 || point.x > WIDTH/2 || point.y < -HEIGHT/2 || point.y > HEIGHT/2) continue; 
                    
-                    int depth = (uint)255-(point.z);
-                    if (depth < 0) depth = 0;
+            //         int depth = (uint)255-(point.z);
+            //         if (depth < 0) depth = 0;
 
-                    else if(depth >255) depth = 255;
+            //         else if(depth >255) depth = 255;
 
-                    SDL_SetRenderDrawColor(renderer, depth, depth, depth, 255);
-                    // std::cout<< (uint)255-point.z << " " ;
-                    SDL_RenderDrawPointF(renderer, point.x+WIDTH/2, -point.y+HEIGHT/2);
-                }
+            //         SDL_SetRenderDrawColor(renderer, depth, depth, depth, 255);
+            //         // std::cout<< (uint)255-point.z << " " ;
+            //         float xf = point.x+WIDTH/2;
+            //         float yf = -point.y+HEIGHT/2;
+            //         SDL_RenderDrawPointF(renderer, xf, yf);
+
+            //         float r = (depth*2)/255; // maximum radius is 4 (closest to the screen)
+
+            //         if ( depth > 50) { // less than 50 it doesnt enter, for optimization
+            //             for ( float a = 0; a < 3*3.1415; a += 3.1415/4) { // increases with a 45° step
+
+            //                 SDL_RenderDrawPointF(renderer, xf+std::cos(a)*r, yf+std::sin(a)*r);
+            //             }
+            //         }
+            //     } 
                 
 
-            }
+            // }
 
             // draws for each obj buffer
             for (auto & obj_buffer : object_map) {
@@ -142,7 +160,19 @@ class Screen {
 
                         SDL_SetRenderDrawColor(renderer, depth, depth, depth, 255);
                         // std::cout<< (uint)255-point.z << " " ;
-                        SDL_RenderDrawPointF(renderer, point.x+WIDTH/2, -point.y+HEIGHT/2);
+                        float xf = point.x+WIDTH/2;
+                        float yf = -point.y+HEIGHT/2;
+                        SDL_RenderDrawPointF(renderer, xf, yf);
+
+                        // didnt really like the result
+                        // float r = (depth*1)/255; // maximum radius is 4 (closest to the screen)
+
+                        // if ( depth > 50) { // less than 50 it doesnt enter, for optimization
+                        //     for ( float a = 0; a < 3*3.1415; a += 3.1415/4) { // increases with a 45° step
+
+                        //         SDL_RenderDrawPointF(renderer, xf+std::cos(a)*r, yf+std::sin(a)*r);
+                        //     }
+                        // }
                     }
                 }
             }

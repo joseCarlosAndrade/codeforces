@@ -56,8 +56,8 @@ int main() {
 
         /* TORUS */
             screen.rotate_points_x(0.05, torus);
-            screen.rotate_points_y(-0.05, torus);
-            screen.rotate_points_z(0.02, torus);
+            screen.rotate_points_y(0.05, torus);
+            screen.rotate_points_z(0.05, torus);
 
         /* POINT CLOUD */
             screen.rotate_points_x(0.05, pointcloud);
