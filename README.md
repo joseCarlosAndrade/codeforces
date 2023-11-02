@@ -3,9 +3,19 @@
 Repository to store some of my code.
 Most projects are for academic pourposes, but you'll also find personal studies or projects. The most important directories are listed below:
 
+---
+
+## C++
+
+One of my favourites. It stores from a machine learning snake ai game project to a 3d rendering engine. There's also some work with OpenGL.
+
+![](https://github.com/joseCarlosAndrade/dev-jc/blob/main/media/3d.gif)
+
+3D Rendering engine using only SDL2. It's located at `cpp/sdl2/3drendering`. You can compile it with `make points_to_line` and run with `./bin/points_to_line`. It's still a work in progess and for now there's not really much to do yet, but it's still fun to play with the geometric transformation.  
+
 ## C
 
-The largets of them. It stores everything from university exercices and lists such as `/icc1` and `/lab-icc1`, my personal codeforces solution sets, to personal projects and studies, often on the  `/study` and `/thrown` directories.
+One of the largets of them. It stores everything from university exercices and lists such as `/icc1` and `/lab-icc1`, my personal codeforces solution sets, to personal projects and studies, often on the  `/study` and `/thrown` directories.
 
 ![](https://github.com/joseCarlosAndrade/dev-jc/blob/main/media/donut.gif)
 
