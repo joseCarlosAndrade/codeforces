@@ -31,6 +31,7 @@ namespace Geometry {
         // return points;
     }
 
+    /* Cube creation routine */
     void create_cube(int arest_size, std::vector<F3DPoint> &vec) {
             // creating a cube
             int vertice = arest_size/2;
@@ -53,6 +54,98 @@ namespace Geometry {
 
             
         }
+
+    /* Torus creation routine */
+    void create_torus (float t_radius, int c_radius, std::vector<F3DPoint> &vec) {
+        // int t_radius = 100;
+        // int c_radius = 50;
+
+        for ( float phi = 0 ; phi < 2*3.1415; phi+=3.1415/50) {
+            MatrixRotationY rotation_y(phi);
+            
+            for ( float i = 0; i < 2*3.14159; i+=3.14159/100) {
+                
+                // creating first circle
+                float xf =t_radius + c_radius*std::cos(i);
+                float yf = c_radius*std::sin(i);
+                float zf = 0;
+
+                // rotating it arround y axis
+                GenMatrix4x4f p(xf, yf,zf);
+                p = rotation_y * p;
+
+                // pixel(p(0,0),  p(1,0), p(2,0), buffer);
+                vec.push_back({p(0,0),  p(1,0), p(2,0)});
+            }
+        }
+        
+
+    }
+
+    /* ## Simple point cloud */
+    class PointCloud : public Object {
+        public:
+            /* Creates a point cloud from a raw sequence of coodinates on an unidimensional vector on the format:
+            {x1, y1, z1, x2, y2, z2, ... , xn, yn, zn} */
+            PointCloud(std::vector<float> points) {
+                if (points.size()%3) {
+                    std::cerr << "Error: passing not divisible by 3 data on point vector: Creationg of point cloud\n";
+                }
+                int n_points = points.size()/3;
+
+                float xc = 0;
+                float yc = 0;
+                float zc = 0;
+
+                for ( int i = 0 ; i < n_points; i ++) {
+                    F3DPoint p = { points[3*i], points[3*i + 1], points[ 3*i + 2]};
+                    getPoints().push_back(p);
+                    xc += p.x;
+                    yc += p.y;
+                    zc += p.z;
+                }
+
+                setCenter(xc/n_points, yc/n_points, zc/n_points);
+
+            }
+
+            /* Creates a point cloud from a raw sequence of coodinates on an unidimensional `n_points` size array on the format:
+            {x1, y1, z1, x2, y2, z2, ... , xn, yn, zn} */
+            PointCloud(float points[], int n_points) {
+                float xc = 0;
+                float yc = 0;
+                float zc = 0;
+
+                for ( int i = 0 ; i < n_points; i ++) {
+                    F3DPoint p = { points[3*i], points[3*i + 1], points[ 3*i + 2]};
+                    getPoints().push_back(p);
+                    xc += p.x;
+                    yc += p.y;
+                    zc += p.z;
+                }
+
+                setCenter(xc/n_points, yc/n_points, zc/n_points);
+            }
+
+            /* Creates a point cloud from a point vector in the format:
+            {{x1, y1, z1}, {x2, y2, z2}, ... , {xn, yn, zn}} */
+            PointCloud(std::vector<F3DPoint> points) {
+                float xc = 0;
+                float yc = 0;
+                float zc = 0;
+                int n_points = points.size();
+
+                for ( int i = 0 ; i < n_points; i ++) {
+                    
+                    getPoints().push_back(points[i]);
+                    xc += points[i].x;
+                    yc += points[i].y;
+                    zc += points[i].z;
+                }
+
+                setCenter(xc/n_points, yc/n_points, zc/n_points);
+            }
+    };
 
     /* ## Line Object */
     class Line : public Object {
@@ -83,7 +176,12 @@ namespace Geometry {
     };
 
     class Torus : public Object {
-
+        public:
+            /* Creates a Torus object centralized at the world origin with `torus_radius` and `circle_radius` parameters. */
+            Torus(float torus_radius, float circle_radius) {
+                create_torus(torus_radius, circle_radius, getPoints());
+                setCenter(0,0, 0);
+            }
     };
 
 }
