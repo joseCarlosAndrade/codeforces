@@ -3,6 +3,7 @@
 
 #include<iostream>
 #include<vector>
+#include<stack>
 
 typedef struct _3dPoint {
     float x;
@@ -15,6 +16,8 @@ class Object {
     private:
         std::vector<F3DPoint> points;
         F3DPoint center;
+        // float lastx, lasty, lastz;
+        std::stack<F3DPoint> point_stack;
 
     public:
         Object() {}
@@ -33,8 +36,19 @@ class Object {
         center.z = z;
     }
 
-    F3DPoint getCenter() {
+    F3DPoint& getCenter() {
         return center;
+    }
+
+    void pushPosition(F3DPoint point) {
+        point_stack.push(point);
+    }
+
+    F3DPoint popPosition() {
+        F3DPoint point = point_stack.top();
+        point_stack.pop();
+
+        return point;
     }
 
 };

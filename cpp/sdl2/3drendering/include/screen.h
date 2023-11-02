@@ -44,6 +44,8 @@ class Screen {
 
         MatrixScale _scale_matrix;
 
+        
+
     public:
         Screen() {
             SDL_Init(SDL_INIT_VIDEO);
@@ -165,6 +167,30 @@ class Screen {
             
         }
 
+        /* Centralizes the object (using its center as reference) and pushes its center coordinate so it can be translated back
+        to the original position again. */
+        void centralize(Object &obj) {
+            F3DPoint c = obj.getCenter();
+            // std::cout << "translating to center: " << obj.getCenter().x << " " << -c.y << " " << -c.z << std::endl;
+         
+            obj.pushPosition(c);
+            translate_points(-c.x, -c.y, -c.z, obj);
+
+        }
+
+        /* Pops the last position pushed on position stack so it can be translated to the original position. Its useful
+        to rotate and scale objects that are not in the world origin:
+        
+        centralize(obj);
+        '' rotate, scale, do whatever you want''
+        back_to_last_position(obj);
+         */
+        void back_to_last_position(Object &obj) {
+            F3DPoint c = obj.popPosition();
+
+            translate_points(c.x, c.y, c.z, obj);
+        }
+
 
         void rotate_points_x(float angle, int buffer =-1) {
             
@@ -197,7 +223,13 @@ class Screen {
                 point.y = pt(1, 0);
                 point.z = pt(2, 0);
 
-            }    
+            }   
+
+            F3DPoint c = obj.getCenter();
+            GenMatrix4x4f pt(c.x, c.y, c.z); 
+            pt = _rotation_matrix_x * pt;
+
+            obj.setCenter(pt(0, 0), pt(1, 0), pt(2, 0));
         }
 
         void rotate_points_y(float angle, int buffer=-1) {
@@ -234,6 +266,12 @@ class Screen {
 
             }    
 
+            F3DPoint c = obj.getCenter();
+            GenMatrix4x4f pt(c.x, c.y, c.z); 
+            pt = _rotation_matrix_y * pt;
+
+            obj.setCenter(pt(0, 0), pt(1, 0), pt(2, 0));
+
         }
 
         void rotate_points_z(float angle, int buffer=-1) {
@@ -269,7 +307,17 @@ class Screen {
 
             }    
 
+            F3DPoint c = obj.getCenter();
+            GenMatrix4x4f pt(c.x, c.y, c.z); 
+            pt = _rotation_matrix_z * pt;
+
+            obj.setCenter(pt(0, 0), pt(1, 0), pt(2, 0));
+
         }
+
+        // void rotate_objects(float ang_x, float ang_y, float ang_z) {
+
+        // }
 
         void translate_points(float tx, float ty, float tz, int buffer= -1) {
             /*
@@ -277,38 +325,25 @@ class Screen {
             0 1 ty
             0 0 1
             */
-            _translation_matrix.x(tx);
-            _translation_matrix.y(ty);
-            _translation_matrix.z(tz);
+
             
-            if (buffer < 0) {       
-                for ( auto & points : point_map) {
-                    for (auto &point : points.second ) {
-                        GenMatrix4x4f pt(point.x, point.y, point.z);
+            if (buffer < 0) {
+                for ( auto & buffer : object_map) {
 
-                        pt = _translation_matrix * pt;
-                        point.x = pt(0, 0);
-                        point.y = pt(1, 0);
-                        point.z = pt(2, 0);
-
-                    }        
-                }   
-            }
-            else {
-                for (auto &point : point_map[buffer] ) {
-                        GenMatrix4x4f pt(point.x, point.y, point.z);
-
-                        pt = _translation_matrix * pt;
-                        point.x = pt(0, 0);
-                        point.y = pt(1, 0);
-                        point.z = pt(2, 0);
-
-
+                    for (auto obj : buffer.second) {
+                        translate_points(tx, ty, tz, *obj);
                     } 
+                }
+            }
+
+            else {
+                for (auto obj : object_map[buffer]) {
+                        translate_points(tx, ty, tz, *obj); 
+                    }     
             }
         }
 
-        void translate_points(Object & obj, float tx, float ty, float tz) {
+        void translate_points(float tx, float ty, float tz, Object & obj) {
 
             _translation_matrix.x(tx);
             _translation_matrix.y(ty);
@@ -324,6 +359,14 @@ class Screen {
 
             }        
                   
+            F3DPoint c = obj.getCenter();
+            GenMatrix4x4f pt(c.x, c.y, c.z); 
+            pt = _translation_matrix * pt;
+            // c.x = pt(0, 0);
+            // c.y = pt(1, 0);
+            // c.z = pt(2, 0);
+            // std::cout << c.x << "translating the center " << c.y << " " << c.z << std::endl;
+            obj.setCenter(pt(0, 0), pt(1, 0), pt(2, 0));
             
         }
 

@@ -70,11 +70,12 @@ namespace Geometry {
     };
 
     class Cube : public Object {
-        /* Creates a Cube object from the specified arest parameter. By default, the cube is centered on (0, 0, 0). */
-        Cube(float arest) {
-            create_cube(arest, getPoints());
-            setCenter(0,0, 0);
-        }
+        public:
+            /* Creates a Cube object from the specified arest parameter. By default, the cube is centered on (0, 0, 0). */
+            Cube(float arest) {
+                create_cube(arest, getPoints());
+                setCenter(0,0, 0);
+            }
     };
 
     class Circle : public Object {
