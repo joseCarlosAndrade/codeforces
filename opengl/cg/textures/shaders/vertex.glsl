@@ -1,4 +1,4 @@
-#version 4.20
+#version 420
 
 in vec3 position; // attribute is deprecated
 in vec2 texture_coord; // texel coordinate

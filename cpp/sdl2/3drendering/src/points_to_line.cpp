@@ -10,7 +10,7 @@ int main() {
     screen.addObjectToScene(&line, 0); 
 
     // cube on buffer 1
-    Object cube = Geometry::Cube(100);
+    Object cube = Geometry::Cube(300);
     screen.addObjectToScene(&cube, 1);
     screen.translate_points(0, 200, 0, cube);
 

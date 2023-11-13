@@ -163,10 +163,11 @@ class Screen {
 
                         // if (point.z >= 130) continue;
 
-                        int depth = (uint)(point.z);
-                        if (depth < 0) depth = 0;
+                        // int depth = (uint)(point.z);
+                        // if (depth < 100) depth = 100;
 
-                        else if(depth >255) depth = 255;
+                        // else if(depth >255) depth = 255;
+                        int depth = 255;
 
                         SDL_SetRenderDrawColor(renderer, depth, depth, depth, 255);
 

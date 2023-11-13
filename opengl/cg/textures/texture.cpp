@@ -1,11 +1,12 @@
 
-extern "C" {
+// extern "C" {
     #include<GL/glew.h>
 
-    // #define STBI_NO_FAILURE_STRINGS
-    // #define STB_IMAGE_IMPLEMENTATION
+    #define STBI_NO_FAILURE_STRINGS
+    #define STB_IMAGE_IMPLEMENTATION
     // #include"include/stb_image.h"
-}
+    #include"include/stb_image.h"
+// }
 #define GLFW_INCLUDE_NONE
 #include<GLFW/glfw3.h>
 
@@ -18,9 +19,9 @@ extern "C" {
 
 // to read images
 // #include<opencv2/opencv.hpp>
-#include<opencv2/core/core.hpp>
-#include<opencv2/highgui/highgui.hpp>
-#include<opencv2/imgcodecs.hpp>
+// #include<opencv2/core/core.hpp>
+// #include<opencv2/highgui/highgui.hpp>
+// #include<opencv2/imgcodecs.hpp>
 
 #define WIDTH 1200
 #define HEIGHT 1600
@@ -38,7 +39,7 @@ typedef struct model {
 } Model;
 
 GLuint shaders_handler();
-const GLchar* read_shader(std::string file_name);
+std::string read_shader(std::string file_name, std::string * target_string);
 Model read_wavefront_file(std::string file_name);
 void load_texture_from_file(int texture_id, std::string file_name);
 void draw_box();
@@ -50,18 +51,25 @@ int main() {
     glfwWindowHint( GLFW_VISIBLE, GLFW_FALSE);
     GLFWwindow * window = glfwCreateWindow(WIDTH, HEIGHT, "malhas e texturas", NULL, NULL);
     glfwMakeContextCurrent(window);
+
+    GLint GlewInitResult = glewInit();
+	printf("Status of Glew initialization: %s\n", glewGetErrorString(GlewInitResult));
+
     
     // // shaders handling
+    std::cout << "shader handling" << std::endl;
     GLuint program = shaders_handler();
 
-   
+    std::cout << "nao sei oq ta rolando";
     glEnable(GL_TEXTURE_2D);
     int qt_textures = 10;
     GLuint textures;
     glGenTextures(qt_textures, &textures);
 
     // reading model
+    std::cout << "reading";
     Model model = read_wavefront_file("caixa.obj");
+    std::cout << "wavefront read." << std::endl;
 
     std::vector<float> vertices_list;
     std::vector<float> textures_coord_list;
@@ -129,38 +137,53 @@ void draw_box() {
 
 void load_texture_from_file(int texture_id, std::string file_name) {
     glBindTexture(GL_TEXTURE_2D, texture_id);
-
+    
+    
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    cv::Mat image = cv::imread(file_name);
+    // cv::Mat image = cv::imread(file_name);
 
-    int width = image.cols;
-    int height = image.rows;
-    
+    // int width = image.cols;
+    // int height = image.rows;
+    int width, height, nr_channels;
+    uint8_t *data = stbi_load(file_name.c_str(), &width, &height, &nr_channels, 0);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image.data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 }
 
 // Reading shaders from file
-const GLchar* read_shader(std::string file_name) {
-    std::string line;
+std::string read_shader(std::string file_name, std::string * target_string) {
+    std::cout << "read ....";
+    std::cout <<"OPASFADSPFADS;";
+
+    for ( int i = 0; i < 10; i++) {
+        std::cout << "eita" << i << std::endl;
+    }
+
+    std::string line, sfinal = "";
     std::ifstream file(file_name);
+    std::stringstream buffer;
 
     if (file.is_open()) {
-        while (file >> line) {
-
-        }
+        // while (file >> line) {
+        //     // std::cout << "line: " << line <<std::endl;
+        //     sfinal.append(line);
+        // }
+        
+        buffer << file.rdbuf();
+        sfinal = buffer.str();
         file.close();
     }
     else {
         std::cerr << "Unable to open file " << file_name << std::endl;
         exit(EXIT_FAILURE);
     }
-    
-    return line.c_str();
+    std::cout << "final file: \n" << sfinal;
+    *target_string = sfinal;
+    return sfinal;
 }
 
 // Compiling, attaching and linking shaders
@@ -173,9 +196,16 @@ GLuint shaders_handler() {
 	// "{\n"
 	// "	gl_Position = vec4(position, 0.0, 1.0);\n"
 	// "}\n";
-    const GLchar* vertex_code = read_shader("shaders/vertex.glsl");
-    const GLchar* fragment_code = read_shader("shaders/fragment.glsl");
+    std::cout << "startintritn" ;
+    std::string vertex_code = ""; 
+    read_shader("shaders/vertex.glsl", &vertex_code);
+    std::cout << "read ....";
+    std::string fragment_code = "";
+    read_shader("shaders/fragment.glsl", &fragment_code);
+    const GLchar * v_code = vertex_code.c_str();
+    const GLchar * f_code = fragment_code.c_str();
 
+    std::cout << "read ....";
 	// const GLchar* fragment_code =
 	// "uniform vec4 color;\n"
 	// "void main() {\n"
@@ -183,18 +213,30 @@ GLuint shaders_handler() {
 	// "}\n"; //rgba normalized
 
 	// requiring gpu slots
+    for (int i = 0; i < 10 ; i++) {
+        std::cout <<"ja comílou" << i << std::endl;
+        // std::cout << fragment_code << std::endl;
+    } 
 	GLuint program = glCreateProgram();
 	GLuint vertex = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
 
+    
+
 	// associating shader sources with glsl code
-	glShaderSource(vertex, 1, &vertex_code, NULL);
-	glShaderSource(fragment, 1, &fragment_code, NULL);
+	glShaderSource(vertex, 1, &v_code, NULL);
+	glShaderSource(fragment, 1, &f_code, NULL);
 
 	glCompileShader(vertex); // compiling
 
 	// error handling
 	GLint isCompiled = 0;
+
+    for (int i = 0; i < 10 ; i++) {
+        std::cout <<"   aaaaAAAAAAAAAAAAAAAAAAA" << i << std::endl;
+        // std::cout << fragment_code << std::endl;
+    } 
+                
 
 	glGetShaderiv(vertex, GL_COMPILE_STATUS, &isCompiled);
 	if(isCompiled == GL_FALSE)
@@ -224,7 +266,9 @@ GLuint shaders_handler() {
         std::cerr << "Error on Fragment Shader.\n" ;           
         std::cerr <<  info <<std::endl;                                     
                                                                       
-    }                 
+    }    
+
+    
 
 	// associating the created programns to main code
 	glAttachShader(program, vertex);
