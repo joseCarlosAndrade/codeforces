@@ -1,6 +1,16 @@
 CXX_FLAGS+=-Wall -Wextra -Wpedantic -Werror -std=c++14 -Iinclude
 LD_FLAGS+= -lSDL2
 
-points_to_line:
+all:
 	mkdir -p bin/
-	g++ src/points_to_line.cpp include/Matrices.hpp $(CXX_FLAGS) $(LD_FLAGS) -O3 -o bin/points_to_line
+	g++ src/main.cpp include/Matrices.hpp $(CXX_FLAGS) $(LD_FLAGS) -O3 -o bin/main
+
+minion:
+	mkdir -p bin/
+	g++ src/minion.cpp include/Matrices.hpp $(CXX_FLAGS) $(LD_FLAGS) -O3 -o bin/minion
+
+run:
+	./bin/main
+
+run_minion:
+	./bin/minion

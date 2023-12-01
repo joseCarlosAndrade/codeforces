@@ -8,11 +8,11 @@
 
 #include"Matrices.hpp" // matrices handling
 
-#include"Geometry.hpp" // geometric objects
+#include"Object.hpp" // geometric objects
 
-#define WIDTH 640
-#define HEIGHT 480
-#define RESOLUTION_SCALE 1
+#define WIDTH 460
+#define HEIGHT 300
+#define RESOLUTION_SCALE 2  
 
 /* TODO:
 Different projection modes. Currently theres only orthogonal
@@ -167,7 +167,10 @@ class Screen {
                         // if (depth < 100) depth = 100;
 
                         // else if(depth >255) depth = 255;
-                        int depth = 255;
+                        int depth = point.z + 40;
+
+                        if (depth < 120) depth = 120;
+                        else if (depth > 255) depth = 255;
 
                         SDL_SetRenderDrawColor(renderer, depth, depth, depth, 255);
 

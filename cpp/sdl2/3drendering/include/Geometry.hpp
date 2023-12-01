@@ -1,10 +1,16 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
+/* Implementation example. Including the Object (mandatory) and Matrices (optional) headers
+to build 3d shapes.*/
+
+
 #include"Object.hpp"
 #include"Matrices.hpp"
 #include<iostream>
 #include<cmath>
+
+#define PI 3.14159
 
 namespace Geometry {
     /* # Basic geometric shape generation functions. They are shared among the geometry objects down below. */
@@ -82,6 +88,14 @@ namespace Geometry {
         }
         
 
+    }
+
+    /* Cricle facing xy plane, at z=0 */
+    void create_circle( float xo , float yo, float zo , float radius, std::vector<F3DPoint> &vec) {
+            
+        for ( float i = 0; i < 2*3.14159; i+=3.14159/360) {
+            vec.push_back({xo + radius*std::cos(i), yo + radius*std::sin(i), zo});
+        }
     }
 
     /* ## Simple point cloud */
@@ -174,7 +188,20 @@ namespace Geometry {
     };
 
     class Circle : public Object {
+        public: 
+            /*Creates a Circle object centered at `xo`, `yo`, with `radius` and facing xy plane (z=0. )*/
+            Circle(float xo, float yo, float radius, bool filled = false) {
+                create_circle(xo, yo, 0, radius, getPoints());
+                setCenter(xo, yo, 0);
 
+                if (!filled) return;
+
+                // filling
+                for ( int i = 0; i < radius; i += radius/10) {
+                    create_circle(xo, yo, 0, i, getPoints());
+                }
+
+            }
     };
 
     class Torus : public Object {
@@ -186,5 +213,56 @@ namespace Geometry {
             }
     };
 
+    class Sphere : public Object {
+        public:
+            Sphere(float radius, bool half = false) {
+                // create a lot of circles
+                int scaling = 30;
+                for (int i = 0 ; i <= scaling; i ++) {
+                    float r = i* PI/scaling;
+                    float zo = i*2*radius/scaling - radius;
+                    r = std::sqrt(std::pow(radius, 2) - std::pow(zo, 2) );
+                    create_circle(0, 0, zo, r, getPoints());
+
+                    setCenter(0, 0, 0);
+
+                    if (i == scaling/2 && half) break;
+                }
+            }
+
+    };
+
+    class Cilinder : public Object {
+        public:
+            Cilinder(float radius, float height, bool closed = true) {
+                float zo = -height/2;
+                int step = 50;
+                for (int i = 0; i < step; i++) {
+                    create_circle(0, 0, zo + i*height/step, radius, getPoints());
+                }
+                setCenter(0, 0, 0);
+
+                if (closed) {
+                    for ( int i = 0; i < radius; i += radius/10) {
+                        create_circle(0, 0, zo, i, getPoints());
+                        create_circle(0, 0, zo+height, i, getPoints());
+
+                    }
+                }
+            }
+    };
+
 }
+
 #endif
+
+
+/*
+
+
+
+0 0 0 0 0 0 0 0 0 0 0
+
+
+
+*/
