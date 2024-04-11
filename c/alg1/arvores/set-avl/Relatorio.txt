@@ -1,0 +1,35 @@
+Integrantes: 
+José Carlos Andrade do Nascimento - 12549450
+Eduardo Pereira de Luna Freire - 14567304
+
+Escolha de Estrutura de dados:
+
+A arvore AVL foi escolhida para este projeto por oferecer uma grande eficiência nas operações de inserção, remoção e busca, que são as operações mais utilizadas para construir o TAD de Conjunto.
+O acesso aos elementos do conjunto (imprimir) é feito em pré-ordem (imprimr raiz, ir para esquerda, ir para direita), uma vez que conjuntos não possuem ordenação.
+
+---
+
+Analise de Complexidade
+
+Operações básicas
+
+- Criar: O(constante)
+
+- Apagar: O(N). É necessário percorrer a árvore em sua totalidade, apagando um item de cada vez.
+
+- Busca: O(log N). A altura de uma AVL é de log N. Numa busca, percorremos a árvore da raiz até a sua base, no pior caso.
+
+- Inserir: O(log N). É necessário percorrer a árvore partindo da raiz até a sua base.
+
+- Remover: O(log N). É necessário percorrer a árvore partindo da raiz até encontrar o item desejado, depois, é necessário subir até a raiz, balanceando-a.
+
+- Imprimir: O(N). É necessário percorrer a árvore em sua totalidade para que todos os itens sejam impressos.
+
+Operações específicas:
+
+- Pertence: O(log N). É simplesmente uma busca em uma árvore AVL.
+
+- União: O(N *log N). É necessário percorrer a árvore elemento por elemento (N) e a cada elemento, inserir na arvore final (log N)
+
+- Intersecção: O(N * log N) no pior caso. No pior caso, os conjuntos que são passados como parâmetros possuem os mesmos elementos. Ou seja, o algoritmo percorre a árvore toda (N) e insere todos os elementos que encontra (log N) a cada um. No pior caso, todos os elementos sao inseridos.
+

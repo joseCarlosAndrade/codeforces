@@ -79,7 +79,7 @@ int inserir(fila_t *f, elem chave, int prior) {
     sobe(f, f->n); // subindo elemento adicionado
     f->n++;
 
-    return 1;
+    return 1;ASA
 }
 
 int remover(fila_t *f, elem *chave) {
