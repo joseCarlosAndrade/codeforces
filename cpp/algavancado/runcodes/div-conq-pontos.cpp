@@ -11,8 +11,10 @@ double calculate_distance(pair<int, int> p1, pair<int, int> p2) {
 
 
 // finding minimal distance
-double find_min_distance(vector<pair<int, int>> vetor, int init, int end) {
+double find_min_distance_loop(const vector<pair<int, int>> &vetor, int init, int end) {
     double min_distance = INFINITY;
+    
+    // 0 1 2 3 4 5
 
     for (int i = init; i < end; i++ ) {
         for (int j = i+1; j <= end; j++) {
@@ -27,28 +29,23 @@ double find_min_distance(vector<pair<int, int>> vetor, int init, int end) {
     return min_distance;
 }
 
-vector<pair<int, int>> find_intersection_points(vector<pair<int, int >> pontos, int half_index, double threshold) {
+vector<pair<int, int>> find_intersection_points(const vector<pair<int, int >> &pontos, int half_index, double threshold, int init, int end) {
+
+
     double min_x = pontos[half_index].first - threshold;
     double max_x = pontos[half_index].first + threshold;
     
     vector<pair<int, int>> new_points;
 
-    // buscando do centro -> esquerda e depois centro -> direita, pois como os pontos ja estao ordenados por x, faz com que deste modo seja mais eficiente
-    for (int i = half_index-1; i >= 0; i--) {
-        if (pontos[half_index].first - pontos[i].first <= threshold) {
+
+
+    for ( int i = init ; i <= end; i++) {
+        if( abs(pontos[i].first - pontos[half_index].first) < threshold) {
             new_points.push_back(pontos[i]);
-        } else {
-            break;
         }
     }
 
-    for (int i = half_index+1; i < pontos.size(); i++) {
-        if (pontos[i].first - pontos[half_index].first <= threshold) {
-            new_points.push_back(pontos[i]);
-        } else {
-            break;
-        }
-    }
+    return new_points;
 }
 
 
@@ -60,6 +57,58 @@ bool sort_by_x_comparison(pair<int, int> a, pair<int, int> b) {
 // comparison  function to use ni std::sotr by y
 bool sort_by_y_comparison(pair<int, int> a, pair<int, int> b) {
     return a.second < b.second;
+}
+
+
+// recebe os pontos ja ordenados em x - passando por const reference para nao ter que copiar os valores de vector constantemente
+double find_minimal_distance(const vector<pair<int, int>> &pontos, int init, int end) {
+
+    int size = end-init +1;
+
+    // caso base
+    if (size <= 3) {
+        // double min;
+        return find_min_distance_loop(pontos, init, end);
+    }
+    //       0 1 2 3 '4' 5 6
+    // 0 1 2 3 4 5 6 '7' 8 9 10
+    //     2 3             9
+
+    // size = 9 - 3 + 1 = 7
+    // half = (9 + 3+1) /2 = 6.5
+
+    int half = ceil((init + end + 1) / 2 ); // arredondando para cima
+
+    double min_distance_left = find_minimal_distance(pontos, init, half-1);
+    double min_distance_right = find_minimal_distance(pontos, half, end);
+
+    double min_both = min_distance_left < min_distance_right ? min_distance_left : min_distance_right;
+
+    // encontrando pontos que estao na intersecção  
+    vector<pair<int, int >> half_points = find_intersection_points(pontos, half-1, min_both, init, end);
+
+    // ordenando pelo eixo y
+    sort(half_points.begin(), half_points.end(), sort_by_y_comparison);
+
+    double min_distance_half = INFINITY;
+
+    if (half_points.size() > 0) {
+
+    
+        for (int i = 0; i < half_points.size()-1; i++) {
+            for (int j = i+1; j < half_points.size() && j-i<=7; j++) {
+                double dist = calculate_distance(half_points[i], half_points[j]);
+
+                if (dist < min_distance_half) {
+                    min_distance_half = dist;
+                }
+            }
+        }   
+    }
+
+    double min_final_distance = min_distance_half < min_both ? min_distance_half : min_both;
+
+    return min_final_distance;
 }
 
 int main(int argc, char ** argv) {
@@ -82,34 +131,8 @@ int main(int argc, char ** argv) {
     // poderiamos usar:
     sort(pontos.begin(), pontos.end(), sort_by_x_comparison);
 
-    // 1 2 3 4 5 6 - 3
-    // 0 1 2 | 3 4 5 - 3 is the start of the second half
+    double minimal_distance = find_minimal_distance(pontos, 0, n-1);
 
-    // 1 2 3 4 5 6 7 - 3/4
-    // 0 1 2 3 | 4 5 6 - 4 is the start of the second half, so 
-
-    int half = ceil(pontos.size() / 2 ); // arredondando para cima
-
-    // pontos[0:half-1] primeira metade
-    // pontos[half:] segunda metade de pontos
-
-    // encontrando distancias minimas em cada lado
-
-    double min_distance_left = find_min_distance(pontos, 0, half-1);
-    double min_distance_right = find_min_distance(pontos, half, pontos.size()-1);
-
-    double min_both = min_distance_left < min_distance_right ? min_distance_left : min_distance_right; // min entre as duas (both)
-
-    // finding intersecting points ordered by y axis
-    vector<pair<int, int >> half_points = find_intersection_points(pontos, half-1, min_both); // passando half-1 pois deve considerar o ponto mais a direita de q
-
-    // order this new vector by y values
-    sort(half_points.begin(), half_points.end(), sort_by_y_comparison);
-
-    // comparar a distancia de cada ponto com no maximo seus proximos 15 pontos
-
-
-    // for (auto a: pontos) {
-    //     cout << a.first << " " << a.second << endl;
-    // }
+    cout << fixed  << setprecision(2) << minimal_distance;
+   
 }
